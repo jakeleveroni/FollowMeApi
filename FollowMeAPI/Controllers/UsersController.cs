@@ -22,16 +22,20 @@ namespace FollowMeAPI.Controllers
                 Guid result;
                 if (Guid.TryParse(userId,out result))
                 {
-                    return JsonConvert.SerializeObject(new UserModel(WebApiApplication.db.GetUser(result)));
+                    var str = WebApiApplication.db.GetUser(result);
+                    System.Diagnostics.Debug.WriteLine("Serialized Object : " + str);
+                    return str;
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine("Could Not Serialized Object");
                     return string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[GET USER][ERROR] : Could not get the user, " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Exceptions thrown");
+                System.Diagnostics.Debug.WriteLine("[GET USER][ERROR] : Could not get the user, " + ex.Message);
                 return string.Empty;
             }
         }

@@ -144,18 +144,17 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public UserModel GetUser(Guid primaryKey)
+        public string GetUser(Guid primaryKey)
         {
             try
             {
                 Document doc = m_userTableContext.GetItem(primaryKey.ToString());
-                var jsonDoc = doc.ToJson();
-                return (UserModel)JsonConvert.DeserializeObject(jsonDoc, typeof(UserModel));
+                return doc.ToJson();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
-                return null;
+                return string.Empty;
             }
         }
 

@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowMeAPI", "FollowMeAPI\FollowMeAPI.csproj", "{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowMeDataBase", "..\FollowMeDataBase\FollowMeDataBase\FollowMeDataBase.csproj", "{8D8BF3DA-8E8F-47AB-931C-4DA814A61A3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowMeDataBase", "..\FollowMeAPI\FollowMeDataBase\FollowMeDataBase.csproj", "{8D8BF3DA-8E8F-47AB-931C-4DA814A61A3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
