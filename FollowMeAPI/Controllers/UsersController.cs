@@ -65,11 +65,11 @@ namespace FollowMeAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("{userId:guid}/{key}/{value}")]
+        [Route("update/{userId:guid}/{key:minlength(1)}/{value:minlength(1)}/")]
         public bool PatchUserModel(string userId, string key, string value)
         {
             FollowMeDataBase.UserItemEnums updateType;
-
+            System.Diagnostics.Debug.WriteLine("HIT IT!");
             // convert key to type of updating 
             switch (key)
             {
