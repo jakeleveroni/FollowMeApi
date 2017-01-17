@@ -33,7 +33,7 @@ namespace FollowMeDataBase
             //user.AddNewTripId("Second Trip");
             //user.TotalMilesTraveled = 1001;
             //user.NumberOfTrips = 2;
-            //db.UpdateExistingUser(user);
+            db.UpdateUser(new Guid("00000000-0000-0000-0000-000000000000"), "Third Trip, Added On The Fly", UserItemEnums.UpdateTrips);
 
             // STOP : TESTING DB WRAPPERS
 

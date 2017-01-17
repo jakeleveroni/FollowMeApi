@@ -20,7 +20,7 @@ namespace FollowMeAPI.Controllers
             try
             {
                 Guid result;
-                if (Guid.TryParse(userId,out result))
+                if (Guid.TryParse(userId, out result))
                 {
                     var str = WebApiApplication.db.GetUser(result);
                     System.Diagnostics.Debug.WriteLine("Serialized Object : " + str);
@@ -58,13 +58,13 @@ namespace FollowMeAPI.Controllers
         }
 
         [HttpDelete]
-        [Route("{userId:maxlength(36)}")]
+        [Route("{userId:guid}")]
         public bool DeleteUserModel(string userId)
         {
             try
             {
                 Guid result;
-                
+
                 if (Guid.TryParse(userId, out result))
                 {
                     WebApiApplication.db.RemoveUser(result);
@@ -78,6 +78,14 @@ namespace FollowMeAPI.Controllers
                 Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
                 return false;
             }
+        }
+
+        [HttpPatch]
+        [Route("{userId:guid}+{key}+{value}")]
+        public bool PatchUserModel(Guid userId, string key, string value)
+        {
+
+            return true;
         }
     }
 }

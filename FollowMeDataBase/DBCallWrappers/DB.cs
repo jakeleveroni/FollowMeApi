@@ -102,16 +102,78 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public bool UpdateExistingUser(UserModel userToUpdate)
+        public bool UpdateUser(Guid userId, string newValue, UserItemEnums updateType)
         {
+            Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
+            Dictionary<string, string> updateAtribNames = new Dictionary<string, string>();
+            string updateExpression;
+
+            switch (updateType)
+            {
+                case UserItemEnums.UpdateBirthDate:
+                    updateAttribValues.Add(":newBD", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#BD", "BirthDate");
+                    updateExpression = "SET #BD = :newBD";
+                    break;
+                case UserItemEnums.UpdateEmail:
+                    updateAttribValues.Add(":newEmail", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#E", "Email");
+                    updateExpression = "SET #E = :newEmail";
+                    break;
+                case UserItemEnums.UpdateMilesTraveled:
+                    updateAttribValues.Add(":newMilesTraveled", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#TMT", "TotalMilesTraveled");
+                    updateExpression = "SET #TMT = :newMilesTraveled";
+                    break;
+                case UserItemEnums.UpdateName:
+                    updateAttribValues.Add(":newName", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#N", "Name");
+                    updateExpression = "SET #N = :newName";
+                    break;
+                case UserItemEnums.UpdateNumberOfTrips:
+                    updateAttribValues.Add(":numberOfTrips", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#NOT", "NumberOfTrips");
+                    updateExpression = "SET #NOT = :numberOfTrips";
+                    break;
+                case UserItemEnums.UpdatePassword:
+                    updateAttribValues.Add(":newPass", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#P", "Password");
+                    updateExpression = "SET #P = :newPass";
+                    break;
+                case UserItemEnums.UpdateTrips:
+                    List<AttributeValue> newTrip = new List<AttributeValue>();
+                    newTrip.Add(new AttributeValue(newValue));
+                    updateAttribValues.Add(":newTrip", new AttributeValue { L = newTrip });
+                    updateAtribNames.Add("#TID", "TripIds");
+                    updateExpression = "SET #TID = list_append(#TID, :newTrip)";
+                    break;
+                case UserItemEnums.UpdateUserName:
+                    updateAttribValues.Add(":newUserName", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#UN", "UserName");
+                    updateExpression = "SET #UN = :newUserName";
+                    break;
+                default:
+                    System.Diagnostics.Debug.WriteLine("[UPDATE-USER][ERROR] : Invalid update option provided");
+                    return false;
+            }
+
+            var request = new UpdateItemRequest
+            {
+                TableName = m_userTableName,
+                Key = new Dictionary<string, AttributeValue>() { { "Guid", new AttributeValue { S = userId.ToString() } } },
+                ExpressionAttributeNames = updateAtribNames,
+                ExpressionAttributeValues = updateAttribValues,
+                UpdateExpression = updateExpression
+            };
+
             try
             {
-                m_userTableContext.UpdateItem(Document.FromJson(userToUpdate.SerializeToJson()), userToUpdate.UserId.ToString());
+                var response = client.UpdateItem(request);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[UPDATE EXISTING USER][ERROR] : Issue updating specified user, " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("[UPDATE-USER][ERROR] : Could not update the user item, + " + ex.Message);
                 return false;
             }
         }
