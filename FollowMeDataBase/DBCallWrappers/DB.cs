@@ -102,7 +102,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public bool UpdateUser(Guid userId, string newValue, UserItemEnums updateType)
+        public bool UpdateUser(string userId, string newValue, UserItemEnums updateType)
         {
             Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
             Dictionary<string, string> updateAtribNames = new Dictionary<string, string>();
@@ -192,11 +192,11 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public bool RemoveUser(Guid primaryKey)
+        public bool RemoveUser(string primaryKey)
         {
             try
             {
-                m_userTableContext.DeleteItem(primaryKey.ToString());
+                m_userTableContext.DeleteItem(primaryKey);
                 return true;
             }
             catch (Exception ex)
@@ -206,11 +206,11 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public string GetUser(Guid primaryKey)
+        public string GetUser(string primaryKey)
         {
             try
             {
-                Document doc = m_userTableContext.GetItem(primaryKey.ToString());
+                Document doc = m_userTableContext.GetItem(primaryKey);
                 return doc.ToJson();
             }
             catch (Exception ex)
@@ -250,12 +250,12 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
-        public bool UserExists(Guid userId)
+        public bool UserExists(string userId)
         {
             Document doc = null;
             try
             {
-                doc = m_userTableContext.GetItem(userId.ToString());
+                doc = m_userTableContext.GetItem(userId);
                 return !(doc == null);
             }
             catch (Exception ex)

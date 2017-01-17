@@ -19,18 +19,9 @@ namespace FollowMeAPI.Controllers
         {
             try
             {
-                Guid result;
-                if (Guid.TryParse(userId, out result))
-                {
-                    var str = WebApiApplication.db.GetUser(result);
-                    System.Diagnostics.Debug.WriteLine("Serialized Object : " + str);
-                    return str;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("Could Not Serialized Object");
-                    return string.Empty;
-                }
+                var str = WebApiApplication.db.GetUser(userId);
+                System.Diagnostics.Debug.WriteLine("Serialized Object : " + str);
+                return str;
             }
             catch (Exception ex)
             {
@@ -63,15 +54,8 @@ namespace FollowMeAPI.Controllers
         {
             try
             {
-                Guid result;
-
-                if (Guid.TryParse(userId, out result))
-                {
-                    WebApiApplication.db.RemoveUser(result);
-                    return true;
-                }
-
-                return false;
+                WebApiApplication.db.RemoveUser(userId);
+                return true;
             }
             catch (Exception ex)
             {
@@ -81,11 +65,52 @@ namespace FollowMeAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("{userId:guid}+{key}+{value}")]
-        public bool PatchUserModel(Guid userId, string key, string value)
+        [Route("{userId:guid}/{key}/{value}")]
+        public bool PatchUserModel(string userId, string key, string value)
         {
+            FollowMeDataBase.UserItemEnums updateType;
 
-            return true;
+            // convert key to type of updating 
+            switch (key)
+            {
+                case "Name":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateName;
+                    break;
+                case "Email":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateEmail;
+                    break;
+                case "BirthDate":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateBirthDate;
+                    break;
+                case "NumberOfTrips":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateNumberOfTrips;
+                    break;
+                case "Password":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdatePassword;
+                    break;
+                case "TotalMilesTraveled":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateMilesTraveled;
+                    break;
+                case "UserName":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateUserName;
+                    break;
+                case "TripIds":
+                    updateType = FollowMeDataBase.UserItemEnums.UpdateTrips;
+                    break;
+                default:
+                    return false;
+            }
+
+            try
+            { 
+                WebApiApplication.db.UpdateUser(userId, value, updateType);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                return false;
+            }
         }
     }
 }
