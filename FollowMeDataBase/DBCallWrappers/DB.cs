@@ -14,6 +14,7 @@ using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Runtime;
 using Newtonsoft.Json;
+using Utility;
 
 namespace FollowMeDataBase.DBCallWrappers
 {
@@ -47,7 +48,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
 
             try
-            {
+            { 
                 client = new AmazonDynamoDBClient(ddbConfig);
             }
             catch (Exception ex)
@@ -265,5 +266,153 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
         #endregion
+
+        #region TRIP_TABLE_WRAPPERS
+        public bool AddNewTrip(TripModel newTrip)
+        {
+            try
+            {
+                m_tripTableContext.PutItem(Document.FromJson(newTrip.SerializeToJson()));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[ADD NEW TRIP][ERROR] : Could not add trip to database, " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool UpdateTrip(string tripId, string newValue, TripItemEnums updateType)
+        {
+            Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
+            Dictionary<string, string> updateAtribNames = new Dictionary<string, string>();
+            string updateExpression;
+
+            switch (updateType)
+            {
+                case TripItemEnums.UpdateTripName:
+                    updateAttribValues.Add(":newName", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#N", "TripName");
+                    updateExpression = "SET #N = :newName";
+                    break;
+                case TripItemEnums.UpdateTripMileage:
+                    updateAttribValues.Add(":newMileage", new AttributeValue { S = newValue });
+                    updateAtribNames.Add("#TM", "TripMileage");
+                    updateExpression = "SET #TM = :newMileage";
+                    break;
+                default:
+                    Console.WriteLine("[UPDATE-TRIP][ERROR] : Invalid update option provided");
+                    return false;
+            }
+
+            var request = new UpdateItemRequest
+            {
+                TableName = m_tripTableName,
+                Key = new Dictionary<string, AttributeValue>() { { "TripId", new AttributeValue { S = tripId.ToString() } } },
+                ExpressionAttributeNames = updateAtribNames,
+                ExpressionAttributeValues = updateAttribValues,
+                UpdateExpression = updateExpression
+            };
+
+            try
+            {
+                var response = client.UpdateItem(request);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[UPDATE-TRIP][ERROR] : Could not update the user item, + " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool RemoveTrip(TripModel oldTrip)
+        {
+            try
+            {
+                m_tripTableContext.DeleteItem(oldTrip.TripId.ToString());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool RemoveTrip(string primaryKey)
+        {
+            try
+            {
+                m_tripTableContext.DeleteItem(primaryKey);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                return false;
+            }
+        }
+
+        public string GetTrip(string primaryKey)
+        {
+            try
+            {
+                Document doc = m_tripTableContext.GetItem(primaryKey);
+                return doc.ToJson();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                return string.Empty;
+            }
+        }
+
+        public TripModel GetTrip(TripModel trip)
+        {
+            try
+            {
+                Document doc = m_userTableContext.GetItem(trip.TripId.ToString());
+                var jsonDoc = doc.ToJson();
+                return (TripModel)JsonConvert.DeserializeObject(jsonDoc, typeof(TripModel));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                return null;
+            }
+        }
+
+        public bool TripExists(TripModel trip)
+        {
+            Document doc = null;
+            try
+            {
+                doc = m_userTableContext.GetItem(trip.TripId.ToString());
+                return !(doc == null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool TripExists(string tripId)
+        {
+            Document doc = null;
+            try
+            {
+                doc = m_tripTableContext.GetItem(tripId);
+                return !(doc == null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                return false;
+            }
+        }
+        #endregion
+
     }
 }

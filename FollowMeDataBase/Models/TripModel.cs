@@ -46,6 +46,13 @@ namespace FollowMeDataBase.Models
             TripMileage = miles;
         }
 
+        public TripModel(TripModel other)
+        {
+            TripId = other.TripId;
+            TripName = other.TripName;
+            TripMileage = other.TripMileage;
+        }
+
         public string SerializeToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
