@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
-
+using Utility;
 
 namespace FollowMeAPI.Controllers
 {
@@ -65,37 +62,37 @@ namespace FollowMeAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("{userId:guid}/{key}/{value}")]
+        [Route("update/{userId:guid}/{key:minlength(1)}/{value:minlength(1)}/")]
         public bool PatchUserModel(string userId, string key, string value)
         {
-            FollowMeDataBase.UserItemEnums updateType;
-
+            UserItemEnums updateType;
+            System.Diagnostics.Debug.WriteLine("HIT IT!");
             // convert key to type of updating 
             switch (key)
             {
                 case "Name":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateName;
+                    updateType = UserItemEnums.UpdateName;
                     break;
                 case "Email":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateEmail;
+                    updateType = UserItemEnums.UpdateEmail;
                     break;
                 case "BirthDate":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateBirthDate;
+                    updateType = UserItemEnums.UpdateBirthDate;
                     break;
                 case "NumberOfTrips":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateNumberOfTrips;
+                    updateType = UserItemEnums.UpdateNumberOfTrips;
                     break;
                 case "Password":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdatePassword;
+                    updateType = UserItemEnums.UpdatePassword;
                     break;
                 case "TotalMilesTraveled":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateMilesTraveled;
+                    updateType = UserItemEnums.UpdateMilesTraveled;
                     break;
                 case "UserName":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateUserName;
+                    updateType = UserItemEnums.UpdateUserName;
                     break;
                 case "TripIds":
-                    updateType = FollowMeDataBase.UserItemEnums.UpdateTrips;
+                    updateType = UserItemEnums.UpdateTrips;
                     break;
                 default:
                     return false;

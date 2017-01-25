@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace FollowMeDataBase
+namespace Utility
 {
     public enum UserItemEnums
     {
@@ -14,7 +14,13 @@ namespace FollowMeDataBase
         UpdateNumberOfTrips,
         UpdateTrips,
         UpdateMilesTraveled,
-        UpdatePassword
+        UpdatePassword,
+    }
+
+    public enum TripItemEnums
+    {
+        UpdateTripName = 0,
+        UpdateTripMileage,
     }
 
 
