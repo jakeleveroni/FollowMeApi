@@ -68,10 +68,11 @@ namespace FollowMeDataBase.DBCallWrappers
             try
             {
                 m_userTableContext = Table.LoadTable(client, m_userTableName);
+                m_tripTableContext = Table.LoadTable(client, m_tripTableName);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[LOAD TABLES][ERROR] : Could not load the Users table, " + ex.Message);
+                Console.WriteLine("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
                 return;
             }
             #region DEBUG_LOAD_TABLE

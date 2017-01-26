@@ -9,7 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogInManager", "CognitoMana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageManager", "StorageManager\StorageManager.csproj", "{F099D8FE-90FC-4B9B-A59E-9F9F43B91B3C}"
 EndProject
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowMeAPI", "FollowMeAPI\FollowMeAPI.csproj", "{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}"
+=======
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}"
+>>>>>>> master
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,7 @@ Global
 		{F099D8FE-90FC-4B9B-A59E-9F9F43B91B3C}.Release|x64.Build.0 = Release|Any CPU
 		{F099D8FE-90FC-4B9B-A59E-9F9F43B91B3C}.Release|x86.ActiveCfg = Release|Any CPU
 		{F099D8FE-90FC-4B9B-A59E-9F9F43B91B3C}.Release|x86.Build.0 = Release|Any CPU
+<<<<<<< HEAD
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -87,6 +92,24 @@ Global
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Release|x64.Build.0 = Release|Any CPU
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Release|x86.ActiveCfg = Release|Any CPU
 		{9D34247D-CE9E-47A6-A6F4-3AD47763FF8C}.Release|x86.Build.0 = Release|Any CPU
+=======
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|ARM.Build.0 = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|x64.Build.0 = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Debug|x86.Build.0 = Debug|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|ARM.ActiveCfg = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|ARM.Build.0 = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|x64.Build.0 = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|x86.ActiveCfg = Release|Any CPU
+		{BDCDF1F5-0111-40C1-8E86-4E65CEA0CA74}.Release|x86.Build.0 = Release|Any CPU
+>>>>>>> master
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
