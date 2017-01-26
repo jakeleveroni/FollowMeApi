@@ -33,17 +33,22 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("TripMileage")]
         public ulong TripMileage { get; set; }
 
+        [DataMember(Name = "TripDescription")]
+        [DynamoDBProperty("TripDescription")]
+        public string TripDescription { get; set; }
+
         // METHODS
         public TripModel()
         {
 
         }
 
-        public TripModel(Guid id, string name, ulong miles)
+        public TripModel(Guid id, string name, ulong miles, string desc)
         {
             TripId = id;
             TripName = name;
             TripMileage = miles;
+            TripDescription = desc;
         }
 
         public TripModel(TripModel other)
@@ -51,6 +56,7 @@ namespace FollowMeDataBase.Models
             TripId = other.TripId;
             TripName = other.TripName;
             TripMileage = other.TripMileage;
+            TripDescription = other.TripDescription;
         }
 
         public string SerializeToJson()
@@ -60,7 +66,8 @@ namespace FollowMeDataBase.Models
 
         public static bool operator ==(TripModel a, TripModel b)
         {
-            if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && a.TripName == b.TripName)
+            if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && 
+                a.TripName == b.TripName && a.TripDescription == b.TripDescription)
             {
                 return true;
             }
@@ -75,7 +82,7 @@ namespace FollowMeDataBase.Models
 
         public override string ToString()
         {
-            return string.Format("Trip Name : {0}\nTrip Miles : {1}\nTrip Id : {2}", TripName, TripMileage, TripId);
+            return string.Format("Trip Name : {0}\nTrip Miles : {1}\nTrip Id : {2}\nDescription : {3}", TripName, TripMileage, TripId, TripDescription);
         }
 
         public override bool Equals(object obj)

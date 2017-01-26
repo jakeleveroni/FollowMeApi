@@ -82,8 +82,6 @@ namespace StorageManager.S3Wrapper
             }
 
             return true;
-
-            return true;
         }
 
     }
