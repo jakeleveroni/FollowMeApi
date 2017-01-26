@@ -10,8 +10,7 @@
 *.sln.docstates
 
 # WEB C# project files
-FollowMeApi/Web.config
-FollowMeDataBase/App.config
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
