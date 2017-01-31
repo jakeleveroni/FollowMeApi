@@ -4,23 +4,22 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using System.IO;
 using Amazon.S3.Model;
-using System.Drawing;
 
 namespace StorageManager.S3Wrapper
 {
     
-    public class S3
+    public class S3 : IDisposable
     {
-        TransferUtility TransUtil;
-        public IAmazonS3 client;
+		private TransferUtility m_TransUtil;
+		private IAmazonS3 m_Client;
 		private string m_S3Bucket = "followme.usercontent";
 
         public S3()
         {
             try
             {
-                client = new AmazonS3Client(Amazon.RegionEndpoint.USWest2);
-                TransUtil = new TransferUtility(client);
+                m_Client = new AmazonS3Client(Amazon.RegionEndpoint.USWest2);
+                m_TransUtil = new TransferUtility(m_Client);
             }
             catch (Exception ex)
             {
@@ -41,7 +40,7 @@ namespace StorageManager.S3Wrapper
 
             try 
             {
-                TransUtil.Upload(uploadReq);
+                m_TransUtil.Upload(uploadReq);
             }
             catch (Exception ex)
             {
@@ -51,7 +50,7 @@ namespace StorageManager.S3Wrapper
             return true;
         }
 
-        public bool UploadTripContent(string tripId, string pathToFile)
+        public bool UploadTripContent(string userId, string tripId, string pathToFile)
         {
             string fileName = string.Empty;
             try
@@ -72,9 +71,11 @@ namespace StorageManager.S3Wrapper
                 Key = "Trips/" + tripId + "/Content/" + fileName,
             };
 
+			uploadReq.Metadata.Add("content-owner", userId);
+
             try
             {
-                TransUtil.Upload(uploadReq);
+                m_TransUtil.Upload(uploadReq);
             }
             catch (Exception ex)
             {
@@ -83,6 +84,8 @@ namespace StorageManager.S3Wrapper
 
             return true;
         }
+
+		// NOTE: Untested code, not sure if working correctly at the moment
 
 		// returns the ARN of the users profile image
 		public string GetUserProfileImageARN(string userId)
@@ -96,7 +99,7 @@ namespace StorageManager.S3Wrapper
 
 			try
 			{
-				response = client.ListObjectsV2(request);
+				response = m_Client.ListObjectsV2(request);
 			}
 			catch (AmazonS3Exception amazonS3Exception)
 			{
@@ -131,11 +134,11 @@ namespace StorageManager.S3Wrapper
 
 				do
 				{
-					response = client.ListObjectsV2(request);
+					response = m_Client.ListObjectsV2(request);
 
 					foreach (S3Object entry in response.S3Objects)
 					{
-						fileNames.Add(entry.Key);
+						fileNames.Add(m_S3Bucket + "/Trips/" + tripId + "/Content/" + entry.Key);
 					}
 
 					request.ContinuationToken = response.NextContinuationToken;
@@ -157,5 +160,54 @@ namespace StorageManager.S3Wrapper
 			return fileNames;
 		}
 
-    }
+		public List<string> GetTripContentARNListByOwner(string userId, string tripId)
+		{
+			List<string> fileNames = new List<string>();
+			ListObjectsV2Response response;
+
+			try
+			{
+				ListObjectsV2Request request = new ListObjectsV2Request
+				{
+					BucketName = m_S3Bucket + "/Trips/" + tripId + "/Content/",
+					MaxKeys = 100,
+				};
+
+				do
+				{
+					response = m_Client.ListObjectsV2(request);
+
+					foreach (S3Object entry in response.S3Objects)
+					{
+						if (response.ResponseMetadata.Metadata["owner"] == userId)
+						{
+							fileNames.Add(m_S3Bucket + "/Trips/" + tripId + "/Content/" + entry.Key);
+						}
+					}
+
+
+					request.ContinuationToken = response.NextContinuationToken;
+				} while (response.IsTruncated);
+			}
+			catch (AmazonS3Exception amazonS3Exception)
+			{
+				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+				{
+					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
+				}
+				else
+				{
+					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, {0}", amazonS3Exception.Message);
+				}
+			}
+
+			return fileNames;
+		}
+
+		public void Dispose()
+		{
+			m_Client.Dispose();
+			m_TransUtil.Dispose();
+		}
+	}
 }
