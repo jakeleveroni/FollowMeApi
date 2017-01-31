@@ -46,9 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataModelTests\UserModelTests\UserModelTest.cs" />
     <Compile Include="TestSuite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataModelTests\TestingSuite.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
