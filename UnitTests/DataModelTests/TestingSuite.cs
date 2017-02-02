@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FollowMeDataBase.DBCallWrappers;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
+using Utility;
 
 namespace UnitTests
 {
@@ -201,31 +202,31 @@ namespace UnitTests
 
 			if (!db.AddNewUser(um))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not create the user");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not create the user");
 				return false;
 			}
 
 			if (!db.AddNewTrip(tm))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not create the trip");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not create the trip");
 				return false;
 			}
 
 			if (!db.UpdateUser(um.UserId.ToString(), tm.TripId.ToString(), Utility.UserItemEnums.UpdateTrips))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not add trip id to user model");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not add trip id to user model");
 				return false;
 			}
 
 			if (um != JsonConvert.DeserializeObject<UserModel>(db.GetUser(um.UserId.ToString())))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : User model created does not match the queried one");
+                Logger.logger.Error("[CUAAT][ERROR] : User model created does not match the queried one");
 				return false;
 			}
 
 			if (tm != JsonConvert.DeserializeObject<TripModel>(db.GetTrip(tm.TripId.ToString())))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Trip model created does not match the queried one");
+                Logger.logger.Error("[CUAAT][ERROR] : Trip model created does not match the queried one");
 				return false;
 			}
 
@@ -237,31 +238,31 @@ namespace UnitTests
 		{
 			if (!db.AddNewUser(um))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not create the user");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not create the user");
 				return false;
 			}
 
 			if (!db.AddNewTrip(tm))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not create the trip");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not create the trip");
 				return false;
 			}
 
 			if (!db.UpdateUser(um.UserId.ToString(), tm.TripId.ToString(), Utility.UserItemEnums.UpdateTrips))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Could not add trip id to user model");
+                Logger.logger.Error("[CUAAT][ERROR] : Could not add trip id to user model");
 				return false;
 			}
 
 			if (um != JsonConvert.DeserializeObject<UserModel>(db.GetUser(um.UserId.ToString())))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : User model created does not match the queried one");
+                Logger.logger.Error("[CUAAT][ERROR] : User model created does not match the queried one");
 				return false;
 			}
 
 			if (tm != JsonConvert.DeserializeObject<TripModel>(db.GetTrip(tm.TripId.ToString())))
 			{
-				Console.WriteLine("[CUAAT][ERROR] : Trip model created does not match the queried one");
+                Logger.logger.Error("[CUAAT][ERROR] : Trip model created does not match the queried one");
 				return false;
 			}
 
@@ -273,19 +274,19 @@ namespace UnitTests
 		{
 			if (!db.RemoveTrip(tm))
 			{
-				Console.WriteLine("[RTFU][ERROR] : Could not remove trip for db");
+                Logger.logger.Error("[RTFU][ERROR] : Could not remove trip for db");
 				return false;
 			}
 
 			if (!db.UpdateUser(um.UserId.ToString(), "null", Utility.UserItemEnums.UpdateTrips))
 			{
-				Console.WriteLine("[RTFU][ERROR] : Could not modify user TripId list");
+                Logger.logger.Error("[RTFU][ERROR] : Could not modify user TripId list");
 				return false;
 			}
 
 			if (db.TripExists(tm.TripId.ToString()))
 			{
-				Console.WriteLine("[RTFU][ERROR] : Trip was not removed");
+                Logger.logger.Error("[RTFU][ERROR] : Trip was not removed");
 				return false;
 			}
 

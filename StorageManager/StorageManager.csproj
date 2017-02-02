@@ -41,6 +41,10 @@
       <HintPath>..\packages\AWSSDK.S3.3.3.5.2\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -63,12 +67,17 @@
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.5.2\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="TestAssets\testImage1.jpg" />
     <Content Include="TestAssets\testImage2.jpg" />
     <Content Include="TestAssets\testIMage3.jpg" />
     <Content Include="TestAssets\testProfile.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FollowMeDataBase\FollowMeDataBase.csproj">
+      <Project>{8d8bf3da-8e8f-47ab-931c-4da814a61a3b}</Project>
+      <Name>FollowMeDataBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

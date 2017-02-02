@@ -17,13 +17,12 @@ namespace FollowMeAPI.Controllers
             try
             {
                 var str = WebApiApplication.db.GetUser(userId);
-                System.Diagnostics.Debug.WriteLine("Serialized Object : " + str);
+                Logger.logger.Debug("Serialized Object : " + str);
                 return str;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Exceptions thrown");
-                System.Diagnostics.Debug.WriteLine("[GET USER][ERROR] : Could not get the user, " + ex.Message);
+                Logger.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -40,7 +39,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[POST USER][ERROR] : Could not post user to db" + ex.Message);
+                Logger.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
                 return false;
             }
         }
@@ -56,7 +55,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
                 return false;
             }
         }
@@ -105,7 +104,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
                 return false;
             }
         }

@@ -4,10 +4,11 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using System.IO;
 using Amazon.S3.Model;
+using Utility;
 
 namespace StorageManager.S3Wrapper
 {
-    
+
     public class S3 : IDisposable
     {
 		private TransferUtility m_TransUtil;
@@ -23,7 +24,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
+                Logger.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
             }
         }
 
@@ -44,7 +45,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[S3-UPLOAD_PROFILE_MAGE][ERROR] : Could not upload profile image, " + ex.Message);
+                Logger.logger.Error("[S3-UPLOAD_PROFILE_MAGE][ERROR] : Could not upload profile image, " + ex.Message);
             }
 
             return true;
@@ -59,7 +60,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload trip content, " + ex.Message);
+                Logger.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload trip content, " + ex.Message);
                 return false;
             }
 
@@ -79,7 +80,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload content, " + ex.Message);
+                Logger.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload content, " + ex.Message);
             }
 
             return true;
@@ -105,11 +106,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-					Console.WriteLine("[S3-GET_USER_PROFILE][ERROR] : AWS credentials are not valid");
+                    Logger.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-					Console.WriteLine("[S3-GET_USER_PROFILE][ERROR] : AWS error message, {0}", amazonS3Exception.Message);
+                    Logger.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS error message, " + amazonS3Exception.Message);
 				}
 
 				return null;
@@ -149,11 +150,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") ||amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
+                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, {0}", amazonS3Exception.Message);
+                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " +  amazonS3Exception.Message);
 				}
 			}
 
@@ -193,11 +194,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
+                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-					Console.WriteLine("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, {0}", amazonS3Exception.Message);
+                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " + amazonS3Exception.Message);
 				}
 			}
 
@@ -211,3 +212,4 @@ namespace StorageManager.S3Wrapper
 		}
 	}
 }
+
