@@ -14,7 +14,7 @@ namespace FollowMeAPI.Controllers
     public class SearchController : ApiController
     {
         [HttpGet]
-        [Route("searchString:min(1)")]
+        [Route("{searchString:min(1)}")]
         public List<string> SearchUsers(string searchString)
         {
             List<string> nameQueryResult = new List<string>();
