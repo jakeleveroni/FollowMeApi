@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using log4net;
-using System.Reflection;
+﻿using log4net;
 
 namespace Utility
 {
@@ -29,6 +24,6 @@ namespace Utility
     public static class Logger
     {
         // logger used for log4net debug logging on IIS
-        public static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static readonly ILog logger = LogManager.GetLogger(typeof(Logger));
     }
 }

@@ -12,13 +12,12 @@ using FollowMeDataBase.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.Runtime;
 using Newtonsoft.Json;
 using Utility;
 
 namespace FollowMeDataBase.DBCallWrappers
 {
-    public class DB
+    public class DB : IDisposable
     {
         AmazonDynamoDBConfig ddbConfig;
         AmazonDynamoDBClient client;
@@ -26,6 +25,9 @@ namespace FollowMeDataBase.DBCallWrappers
         private Table m_tripTableContext;
         private readonly string m_userTableName = "Users";
         private readonly string m_tripTableName = "Trips";
+        private readonly string m_userNameAndPasswordIndex = "UserNameAndPassword-index";
+        private readonly string m_nameIndex = "Name-index";
+        private readonly string m_userNameIndex = "UserName-index";
 
         // sets up the DynamoDB connection 
         public DB()
@@ -256,6 +258,163 @@ namespace FollowMeDataBase.DBCallWrappers
                 return false;
             }
         }
+
+        // returns a list of usermodels that match the specified username and password
+        // if more than one user is returned, you have a probblem, 
+        // if no users are returned, then that account does not exist
+        public List<UserModel> QueryUsersByUserNameAndPassword(string userName, string password)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_userNameAndPasswordIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#un", "UserName"},
+                    {"#p", "Password" }
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":user_name", new AttributeValue { S =  userName }},
+                    {":password", new AttributeValue { S =  password }}
+                },
+                KeyConditionExpression = "#un = :user_name and #p = :password",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for user with username \'" + userName + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
+        }
+
+        // returns a list of users with matching names
+        public List<UserModel> QueryUsersByName(string name)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_nameIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#n", "Name"},
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":name", new AttributeValue { S =  name }},
+                },
+                KeyConditionExpression = "#n = :name",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with name \'" + name + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
+        }
+
+        // returns a list of users with matching usernames
+        public List<UserModel> QueryUsersByUserName(string userName)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_userNameIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#un", "UserName"},
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":user_name", new AttributeValue { S =  userName }},
+                },
+                KeyConditionExpression = "#un = :user_name",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with UserName \'" + userName + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
+        }
         #endregion
 
         #region TRIP_TABLE_WRAPPERS
@@ -404,6 +563,10 @@ namespace FollowMeDataBase.DBCallWrappers
                 Logger.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return false;
             }
+        }
+
+        public void Dispose()
+        {
         }
         #endregion
 

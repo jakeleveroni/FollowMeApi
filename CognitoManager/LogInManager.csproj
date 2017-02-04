@@ -59,7 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CognitoLoginManager.cs" />
+    <Compile Include="AuthInfo.cs" />
     <Compile Include="CustomLogInManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +71,12 @@
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.CognitoIdentity.3.3.1.1\analyzers\dotnet\cs\AWSSDK.CognitoIdentity.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.3.0.7\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FollowMeDataBase\FollowMeDataBase.csproj">
+      <Project>{8d8bf3da-8e8f-47ab-931c-4da814a61a3b}</Project>
+      <Name>FollowMeDataBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
