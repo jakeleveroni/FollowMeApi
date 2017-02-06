@@ -565,6 +565,58 @@ namespace FollowMeDataBase.DBCallWrappers
             }
         }
 
+		// returns a list of tripmodels that match the specified name
+		// if no tripmodels are returned there were no matches
+		public List<TripModel> QueryTripsByName(string tripName)
+		{
+			int resultLimit = 100;
+			List<TripModel> queryResults = new List<TripModel>();
+
+			QueryRequest request = new QueryRequest
+			{
+				TableName = m_tripTableName,
+				IndexName = m_userNameAndPasswordIndex,
+				ExpressionAttributeNames = new Dictionary<string, string>
+				{
+					{"#tn", "TripName"},
+				},
+				ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+					{":trip_name", new AttributeValue { S =  tripName }},
+				},
+				KeyConditionExpression = "#tn = :trip_name",
+				ScanIndexForward = true,
+			};
+
+			QueryResponse response = null;
+
+			try
+			{
+				Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for trips with name \'" + tripName + "\'");
+				response = client.Query(request);
+			}
+			catch (Exception ex)
+			{
+				Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+				return queryResults;
+			}
+
+			List<Dictionary<string, AttributeValue>> items = response.Items;
+
+			if (items.Count == 0)
+			{
+				return queryResults;
+			}
+
+			resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+			for (int i = 0; i < resultLimit; ++i)
+			{
+				queryResults.Add(TripModel.DictionaryToTripModel(items[i]));
+			}
+
+			return queryResults;
+		}
+
         public void Dispose()
         {
         }
