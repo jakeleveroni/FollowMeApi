@@ -71,11 +71,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthInfo.cs" />
-    <Compile Include="CustomLogInManager.cs" />
+    <Compile Include="Login\AuthInfo.cs" />
+    <Compile Include="Login\CustomLogInManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AWSAuthInfo.cs" />
+    <Compile Include="Login\AWSAuthInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
