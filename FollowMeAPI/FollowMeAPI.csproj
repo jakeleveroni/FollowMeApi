@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<<<<<<< HEAD
   <Import Project="..\packages\Microsoft.DiaSymReader.Native.1.4.0\build\Microsoft.DiaSymReader.Native.props" Condition="Exists('..\packages\Microsoft.DiaSymReader.Native.1.4.0\build\Microsoft.DiaSymReader.Native.props')" />
+=======
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+>>>>>>> master
   <Import Project="..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -43,24 +47,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWSSDK.CognitoIdentity, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.CognitoIdentity.3.3.1.1\lib\net45\AWSSDK.CognitoIdentity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.3.7\lib\net45\AWSSDK.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.S3.3.3.5.2\lib\net45\AWSSDK.S3.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AWSSDK.SecurityToken, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SecurityToken.3.3.0.7\lib\net45\AWSSDK.SecurityToken.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AI.DependencyCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -105,6 +93,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+<<<<<<< HEAD
     <Reference Include="Microsoft.AI.Agent.Intercept">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.7\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
     </Reference>
@@ -165,6 +154,28 @@
     </Reference>
     <Reference Include="Roslyn.Utilities">
       <HintPath>..\packages\Roslyn.Utilities.1.0.3\lib\NET45\Roslyn.Utilities.dll</HintPath>
+=======
+    <Reference Include="AWSSDK.Core">
+      <HintPath>..\packages\AWSSDK.Core.3.3.8\lib\net45\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.S3">
+      <HintPath>..\packages\AWSSDK.S3.3.3.5.3\lib\net45\AWSSDK.S3.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.SecurityToken">
+      <HintPath>..\packages\AWSSDK.SecurityToken.3.3.0.9\lib\net45\AWSSDK.SecurityToken.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.CognitoIdentity">
+      <HintPath>..\packages\AWSSDK.CognitoIdentity.3.3.1.2\lib\net45\AWSSDK.CognitoIdentity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AI.Agent.Intercept">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.7\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+>>>>>>> master
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -183,12 +194,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\TripsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sessions\FollowMeSession.cs" />
+    <Compile Include="Sessions\SessionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -196,17 +211,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\CognitoManager\LogInManager.csproj">
+      <Project>{03f4b867-5893-4c41-8acc-996af583461a}</Project>
+      <Name>LogInManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FollowMeDataBase\FollowMeDataBase.csproj">
       <Project>{8D8BF3DA-8E8F-47AB-931C-4DA814A61A3B}</Project>
       <Name>FollowMeDataBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\StorageManager\StorageManager.csproj">
+      <Project>{f099d8fe-90fc-4b9b-a59e-9f9f43b91b3c}</Project>
+      <Name>StorageManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config" />
+    <None Include="Properties\PublishProfiles\FollowMeAPI.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -230,18 +252,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>57064</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8080/</IISUrl>
-          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost:8080/</IISAppRootUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>
@@ -251,4 +262,8 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+<<<<<<< HEAD
 </Project>
+=======
+</Project>
+>>>>>>> master

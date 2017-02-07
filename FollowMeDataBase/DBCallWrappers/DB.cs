@@ -12,13 +12,12 @@ using FollowMeDataBase.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.Runtime;
 using Newtonsoft.Json;
 using Utility;
 
 namespace FollowMeDataBase.DBCallWrappers
 {
-    public class DB
+    public class DB : IDisposable
     {
         AmazonDynamoDBConfig ddbConfig;
         AmazonDynamoDBClient client;
@@ -26,14 +25,12 @@ namespace FollowMeDataBase.DBCallWrappers
         private Table m_tripTableContext;
         private readonly string m_userTableName = "Users";
         private readonly string m_tripTableName = "Trips";
+        private readonly string m_userNameAndPasswordIndex = "UserNameAndPassword-index";
+        private readonly string m_nameIndex = "Name-index";
+        private readonly string m_userNameIndex = "UserName-index";
 
         // sets up the DynamoDB connection 
         public DB()
-        {
-            Initialize();
-        }
-
-        public void Initialize()
         {
             // Initialize the database 
             try
@@ -43,19 +40,47 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("\nError: failed to create a DynamoDB config; " + ex.Message);
+                Logger.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
                 return;
             }
 
             try
-            { 
+            {
                 client = new AmazonDynamoDBClient(ddbConfig);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("\nError: failed to create a DynamoDB client; " + ex.Message);
+                Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
                 return;
-            } 
+            }
+
+            // get description references to all of our databases
+            LoadTables();
+        }
+
+        public DB(string accessKey, string secretAccessKey, string token)
+        {
+            // Initialize the database 
+            try
+            {
+                ddbConfig = new AmazonDynamoDBConfig();
+                ddbConfig.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
+                return;
+            }
+
+            try
+            {
+                client = new AmazonDynamoDBClient(accessKey, secretAccessKey, token, ddbConfig);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+                return;
+            }
 
             // get description references to all of our databases
             LoadTables();
@@ -63,7 +88,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
         private void LoadTables()
         {
-            Console.WriteLine("\n*** Retrieving table information ***");
+            Logger.logger.Info("\n*** Retrieving table information ***");
 
             try
             {
@@ -72,21 +97,9 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
+                Logger.logger.Error("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
                 return;
             }
-            #region DEBUG_LOAD_TABLE
-            // DEEBUG LOGGING
-            //Console.WriteLine("Name: {0}", m_userTable.TableName);
-            //Console.WriteLine("# of items: {0}", m_userTable.ItemCount);
-            //Console.WriteLine("Provision Throughput (reads/sec): {0}", m_userTable.ProvisionedThroughput.ReadCapacityUnits);
-            //Console.WriteLine("Provision Throughput (writes/sec): {0}", m_userTable.ProvisionedThroughput.WriteCapacityUnits);
-
-            //Console.WriteLine("Name: {0}", m_tripTable.TableName);
-            //Console.WriteLine("# of items: {0}", m_tripTable.ItemCount);
-            //Console.WriteLine("Provision Throughput (reads/sec): {0}", m_tripTable.ProvisionedThroughput.ReadCapacityUnits);
-            //Console.WriteLine("Provision Throughput (writes/sec): {0}", m_tripTable.ProvisionedThroughput.WriteCapacityUnits);
-            #endregion
         }
 
         #region USER_TABLE_WRAPPERS
@@ -99,7 +112,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
+                Logger.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
                 return false;
             }
         }
@@ -155,9 +168,11 @@ namespace FollowMeDataBase.DBCallWrappers
                     updateExpression = "SET #UN = :newUserName";
                     break;
                 default:
-                    System.Diagnostics.Debug.WriteLine("[UPDATE-USER][ERROR] : Invalid update option provided");
+                    Logger.logger.Error("[UPDATE-USER][ERROR] : Invalid update option provided");
                     return false;
             }
+
+            Logger.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
 
             var request = new UpdateItemRequest
             {
@@ -175,7 +190,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("[UPDATE-USER][ERROR] : Could not update the user item, + " + ex.Message);
+                Logger.logger.Error("[UPDATE-USER][ERROR] : Could not update the user item, + " + ex.Message);
                 return false;
             }
         }
@@ -189,7 +204,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
+                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
                 return false;
             }
         }
@@ -203,7 +218,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
+                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
                 return false;
             }
         }
@@ -217,7 +232,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -232,7 +247,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return null;
             }
         }
@@ -247,7 +262,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return false;
             }
         }
@@ -262,9 +277,166 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return false;
             }
+        }
+
+        // returns a list of usermodels that match the specified username and password
+        // if more than one user is returned, you have a probblem, 
+        // if no users are returned, then that account does not exist
+        public List<UserModel> QueryUsersByUserNameAndPassword(string userName, string password)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_userNameAndPasswordIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#un", "UserName"},
+                    {"#p", "Password" }
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":user_name", new AttributeValue { S =  userName }},
+                    {":password", new AttributeValue { S =  password }}
+                },
+                KeyConditionExpression = "#un = :user_name and #p = :password",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for user with username \'" + userName + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
+        }
+
+        // returns a list of users with matching names
+        public List<UserModel> QueryUsersByName(string name)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_nameIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#n", "Name"},
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":name", new AttributeValue { S =  name }},
+                },
+                KeyConditionExpression = "#n = :name",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with name \'" + name + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
+        }
+
+        // returns a list of users with matching usernames
+        public List<UserModel> QueryUsersByUserName(string userName)
+        {
+            int resultLimit = 100;
+            List<UserModel> queryResults = new List<UserModel>();
+
+            QueryRequest request = new QueryRequest
+            {
+                TableName = m_userTableName,
+                IndexName = m_userNameIndex,
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    {"#un", "UserName"},
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+                    {":user_name", new AttributeValue { S =  userName }},
+                },
+                KeyConditionExpression = "#un = :user_name",
+                ScanIndexForward = true,
+            };
+
+            QueryResponse response = null;
+
+            try
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with UserName \'" + userName + "\'");
+                response = client.Query(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                return queryResults;
+            }
+
+            List<Dictionary<string, AttributeValue>> items = response.Items;
+
+            if (items.Count == 0)
+            {
+                return queryResults;
+            }
+
+            resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+            for (int i = 0; i < resultLimit; ++i)
+            {
+                queryResults.Add(UserModel.DictionaryToUserModel(items[i]));
+            }
+
+            return queryResults;
         }
         #endregion
 
@@ -278,7 +450,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ADD NEW TRIP][ERROR] : Could not add trip to database, " + ex.Message);
+                Logger.logger.Error("[ADD NEW TRIP][ERROR] : Could not add trip to database, " + ex.Message);
                 return false;
             }
         }
@@ -302,9 +474,11 @@ namespace FollowMeDataBase.DBCallWrappers
                     updateExpression = "SET #TM = :newMileage";
                     break;
                 default:
-                    Console.WriteLine("[UPDATE-TRIP][ERROR] : Invalid update option provided");
+                    Logger.logger.Error("[UPDATE-TRIP][ERROR] : Invalid update option provided");
                     return false;
             }
+
+            Logger.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
 
             var request = new UpdateItemRequest
             {
@@ -322,7 +496,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("[UPDATE-TRIP][ERROR] : Could not update the user item, + " + ex.Message);
+                Logger.logger.Error("[UPDATE-TRIP][ERROR] : Could not update the user item, + " + ex.Message);
                 return false;
             }
         }
@@ -336,7 +510,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                Logger.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
                 return false;
             }
         }
@@ -350,7 +524,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                Logger.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
                 return false;
             }
         }
@@ -364,7 +538,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Logger.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -379,7 +553,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Logger.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return null;
             }
         }
@@ -394,7 +568,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Logger.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return false;
             }
         }
@@ -409,9 +583,65 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Logger.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return false;
             }
+        }
+
+		// returns a list of tripmodels that match the specified name
+		// if no tripmodels are returned there were no matches
+		public List<TripModel> QueryTripsByName(string tripName)
+		{
+			int resultLimit = 100;
+			List<TripModel> queryResults = new List<TripModel>();
+
+			QueryRequest request = new QueryRequest
+			{
+				TableName = m_tripTableName,
+				IndexName = m_userNameAndPasswordIndex,
+				ExpressionAttributeNames = new Dictionary<string, string>
+				{
+					{"#tn", "TripName"},
+				},
+				ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
+					{":trip_name", new AttributeValue { S =  tripName }},
+				},
+				KeyConditionExpression = "#tn = :trip_name",
+				ScanIndexForward = true,
+			};
+
+			QueryResponse response = null;
+
+			try
+			{
+				Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for trips with name \'" + tripName + "\'");
+				response = client.Query(request);
+			}
+			catch (Exception ex)
+			{
+				Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+				return queryResults;
+			}
+
+			List<Dictionary<string, AttributeValue>> items = response.Items;
+
+			if (items.Count == 0)
+			{
+				return queryResults;
+			}
+
+			resultLimit = (items.Count > resultLimit) ? resultLimit : items.Count;
+
+			for (int i = 0; i < resultLimit; ++i)
+			{
+				queryResults.Add(TripModel.DictionaryToTripModel(items[i]));
+			}
+
+			return queryResults;
+		}
+
+        public void Dispose()
+        {
         }
         #endregion
 

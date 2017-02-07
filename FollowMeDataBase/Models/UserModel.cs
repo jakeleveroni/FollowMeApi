@@ -78,6 +78,19 @@ namespace FollowMeDataBase.Models
             TotalMilesTraveled = miles;
         }
 
+        public UserModel(Guid id, string userName, string name, string email, string pass, List<string> trips, DateTime bd, ulong miles)
+        {
+            UserId = id;
+            UserName = userName;
+            Name = name;
+            Email = email;
+            Password = pass;
+            BirthDate = bd.ToString();
+            TripIds = trips;
+            NumberOfTrips = (uint)TripIds.Count;
+            TotalMilesTraveled = miles;
+        }
+
         public UserModel(UserModel other)
         {
             UserId = other.UserId;
@@ -135,8 +148,34 @@ namespace FollowMeDataBase.Models
 
         }
 
+        public static UserModel DictionaryToUserModel(Dictionary<string, AttributeValue> obj)
+        {
+            string id  = obj["Guid"].S;
+            string userName = obj["UserName"].S;
+            string name = obj["Name"].S;
+            string email = obj["Email"].S;
+            DateTime bday;
+            DateTime.TryParse(obj["BirthDate"].S, out bday);
+            ulong totalMiles;
+            ulong.TryParse(obj["TotalMilesTraveled"].N, out totalMiles);
+            string pass = obj["Password"].S;
+            List<string> tripIds = new List<string>();
+
+            for (int i = 0; i < obj["TripIds"].L.Count; ++i)
+            {
+                tripIds.Add(obj["TripIds"].L[i].S);
+            }
+
+            return new UserModel(new Guid(id), userName, name, email, pass, tripIds, bday, totalMiles);
+        }
+
         public static bool operator ==(UserModel a, UserModel b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+            {
+                return false;
+            }
+
             if (a.UserId == b.UserId && a.UserName == b.UserName &&
                 a.Name == b.Name && a.Email == b.Email && 
                 a.Password == b.Password && a.BirthDate == b.BirthDate &&

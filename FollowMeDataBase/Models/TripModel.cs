@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
 
 
@@ -63,6 +64,18 @@ namespace FollowMeDataBase.Models
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
+
+		public static TripModel DictionaryToTripModel(Dictionary<string, AttributeValue> obj)
+		{
+			string id = obj["Guid"].S;
+			string desc = obj["TripDescription"].S;
+			string mileage = obj["TripMileage"].N;
+			string name = obj["TripName"].S;
+			ulong miles;
+			ulong.TryParse(mileage, out miles);
+
+			return new TripModel(new Guid(id), name, miles, desc);
+		}
 
         public static bool operator ==(TripModel a, TripModel b)
         {

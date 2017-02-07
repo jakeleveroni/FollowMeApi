@@ -53,8 +53,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+<<<<<<< HEAD
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.Core.3.3.7.1\lib\net35\AWSSDK.Core.dll</HintPath>
+=======
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net35-full\log4net.dll</HintPath>
+>>>>>>> master
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -73,13 +78,20 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+<<<<<<< HEAD
     <Reference Include="AWSSDK.DynamoDBv2">
       <HintPath>..\packages\AWSSDK.DynamoDBv2.3.3.2\lib\net35\AWSSDK.DynamoDBv2.dll</HintPath>
+=======
+    <Reference Include="AWSSDK.Core">
+      <HintPath>..\packages\AWSSDK.Core.3.3.8\lib\net35\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.DynamoDBv2">
+      <HintPath>..\packages\AWSSDK.DynamoDBv2.3.3.2.1\lib\net35\AWSSDK.DynamoDBv2.dll</HintPath>
+>>>>>>> master
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBCallWrappers\DB.cs" />
-    <Compile Include="Depracated\DBWrapper_old.cs" />
     <Compile Include="Models\TripModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Program.cs" />
@@ -89,12 +101,15 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+<<<<<<< HEAD
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.3.3.1.5\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
   </ItemGroup>
+=======
+>>>>>>> master
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

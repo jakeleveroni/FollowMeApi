@@ -10,6 +10,7 @@ namespace FollowMeDataBase
         static void Main(string[] args)
         {
             // initialize db 
+<<<<<<< HEAD
             DBCallWrappers.DB db = new DBCallWrappers.DB();
 <<<<<<< HEAD
             Console.WriteLine("Database successfully initialized");
@@ -29,29 +30,42 @@ namespace FollowMeDataBase
             // STOP : TESTING DB WRAPPERS
 =======
 >>>>>>> master
+=======
+            //DBCallWrappers.DB db = new DBCallWrappers.DB();
+>>>>>>> master
 
-            // create user
-            Guid id = Guid.NewGuid();
-            UserModel um = new Models.UserModel(id, "drew.cortright", "Drew Cortright", "dc@followme.com", "pass", new DateTime(), 100);
+            //// create user
+            //Guid id = Guid.NewGuid();
+            //UserModel um = new UserModel(id, "drew.cortright", "Drew Cortright", "dc@followme.com", "pass1", new DateTime(), 100);
 
-            // create trip ids
-            Guid tripId1 = Guid.NewGuid();
-            TripModel trip1 = new TripModel(tripId1, "Grand Canyon", 65, "It's a big hole in the ground...");
+            //// create trip ids
+            //Guid tripId1 = Guid.NewGuid();
+            //TripModel trip1 = new TripModel(tripId1, "Grand Canyon", 65, "It's a big hole in the ground...");
 
-            Guid tripId2 = Guid.NewGuid();
-            TripModel trip2 = new TripModel(tripId2, "Scranton Pennsylvania", 257, "Surprisingly prevalent paper company in this town");
+            //Guid tripId2 = Guid.NewGuid();
+            //TripModel trip2 = new TripModel(tripId2, "Scranton Pennsylvania", 257, "Surprisingly prevalent paper company in this town");
 
-            // add trip ids to user
-            um.AddNewTripId(tripId1.ToString());
-            um.AddNewTripId(tripId2.ToString());
+            //// add trip ids to user
+            //um.AddNewTripId(trip1.TripId.ToString());
+            //um.AddNewTripId(trip2.TripId.ToString());
 
-            // write all contents to database
-            db.AddNewUser(um);
-            db.AddNewTrip(trip1);
-            db.AddNewTrip(trip2);
+            //// write all contents to database
+            //db.AddNewUser(um);
+            //db.AddNewTrip(trip1);
+            //db.AddNewTrip(trip2);
 
-            Console.WriteLine("Press any key to exit...");
-            Console.Read();
+            //List<UserModel> l1 = new List<UserModel>();
+            //List<UserModel> l2 = new List<UserModel>();
+            //List<UserModel> l3 = new List<UserModel>();
+            //List<UserModel> l4 = new List<UserModel>();
+
+            //l1 = db.QueryUsersByUserNameAndPassword("drew.cortright", "pass1");
+            //l2 = db.QueryUsersByName("Eric Garza");
+            //l3 = db.QueryUsersByUserName("drew.cortright");
+            //l4 = db.QueryUsersByUserName("jacob.leveroni");
+
+            //Console.WriteLine("Press any key to exit...");
+            //Console.Read();
         }
     }
 }

@@ -10,9 +10,6 @@ namespace CognitoManager
     {
         static void Main(string[] args)
         {
-            CognitoLoginManager logManager = new CognitoLoginManager();
-            logManager.Initialize();
-
         }
     }
 }

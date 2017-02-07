@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Http;
-using FollowMeDataBase.DBCallWrappers;
-using FollowMeDataBase.Models;
+using log4net.Config;
 
 namespace FollowMeAPI
 {
@@ -11,8 +8,9 @@ namespace FollowMeAPI
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
-
+            // enable log4net logging for debugging
+            BasicConfigurator.Configure();
+            Utility.Logger.logger.Info("[APPLICATION START]");
 
             // Web API routes
             config.MapHttpAttributeRoutes();
