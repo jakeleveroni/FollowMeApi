@@ -28,6 +28,19 @@ namespace StorageManager.S3Wrapper
             }
         }
 
+        public S3(string accessKey, string secretAccessKey, string token)
+        {
+            try
+            {
+                m_Client = new AmazonS3Client(accessKey, secretAccessKey, token, Amazon.RegionEndpoint.USWest2);
+                m_TransUtil = new TransferUtility(m_Client);
+            }
+            catch(Exception ex)
+            {
+                Logger.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
+            }
+        }
+
 
         public bool UploadProfileImage(string userId, string pathToFile)
         {

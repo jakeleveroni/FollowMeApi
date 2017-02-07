@@ -11,7 +11,7 @@ namespace FollowMeAPI.Controllers
 	public class SearchController : ApiController
 	{
 		[HttpGet]
-		[Route("/users/{searchString}")]
+		[Route("users/{searchString}")]
 		public List<string> SearchUsers(string searchString)
 		{
 			List<string> queryResults = new List<string>();
@@ -48,7 +48,7 @@ namespace FollowMeAPI.Controllers
 		}
 
 		[HttpGet]
-		[Route("/trips/{searchString}")]
+		[Route("trips/{searchString}")]
 		public List<string> SearchTrips(string searchString)
 		{
 			List<string> nameQueryResult = new List<string>();

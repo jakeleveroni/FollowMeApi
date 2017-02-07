@@ -6,6 +6,7 @@ using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
 using FollowMeDataBase.Models;
 using FollowMeDataBase.DBCallWrappers;
+using Newtonsoft.Json;
 using Utility;
 
 // TODO This is untested code for signing in and requesting credentials through cognito.
@@ -128,7 +129,7 @@ namespace LogInManager
 
                         SessionAWSCredentials sessionCreds = new SessionAWSCredentials(creds.AccessKeyId, creds.SecretAccessKey, creds.SessionToken);
 
-                        authInfo.AWSCredentials = new AWSAuthInfo(creds.AccessKeyId, creds.SessionToken, creds.SessionToken);
+                        authInfo.AWSCredentials = new AWSAuthInfo(creds.AccessKeyId, creds.SecretAccessKey, creds.SessionToken);
 
                         return true;
                     }

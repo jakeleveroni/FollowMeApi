@@ -10,7 +10,7 @@ namespace FollowMeAPI.Sessions
     public static class SessionManager
     {
         public static SessionIDManager m_idManager;
-        private static HashSet<string> m_activeSessionIds;
+        private static HashSet<string> m_activeSessionIds = new HashSet<string>(StringComparer.InvariantCulture);
         private static Dictionary<string, FollowMeSession> m_sessions = new Dictionary<string, FollowMeSession>();
 
         public static bool AddNewSession(FollowMeSession sesh)

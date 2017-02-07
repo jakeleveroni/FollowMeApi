@@ -154,6 +154,10 @@
       <Project>{8d8bf3da-8e8f-47ab-931c-4da814a61a3b}</Project>
       <Name>FollowMeDataBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\StorageManager\StorageManager.csproj">
+      <Project>{f099d8fe-90fc-4b9b-a59e-9f9f43b91b3c}</Project>
+      <Name>StorageManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config" />

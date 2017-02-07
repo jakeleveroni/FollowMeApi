@@ -171,6 +171,11 @@ namespace FollowMeDataBase.Models
 
         public static bool operator ==(UserModel a, UserModel b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+            {
+                return false;
+            }
+
             if (a.UserId == b.UserId && a.UserName == b.UserName &&
                 a.Name == b.Name && a.Email == b.Email && 
                 a.Password == b.Password && a.BirthDate == b.BirthDate &&

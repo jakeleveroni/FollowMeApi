@@ -32,10 +32,33 @@ namespace FollowMeDataBase.DBCallWrappers
         // sets up the DynamoDB connection 
         public DB()
         {
-            Initialize();
+            // Initialize the database 
+            try
+            {
+                ddbConfig = new AmazonDynamoDBConfig();
+                ddbConfig.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
+                return;
+            }
+
+            try
+            {
+                client = new AmazonDynamoDBClient(ddbConfig);
+            }
+            catch (Exception ex)
+            {
+                Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+                return;
+            }
+
+            // get description references to all of our databases
+            LoadTables();
         }
 
-        public void Initialize()
+        public DB(string accessKey, string secretAccessKey, string token)
         {
             // Initialize the database 
             try
@@ -50,14 +73,14 @@ namespace FollowMeDataBase.DBCallWrappers
             }
 
             try
-            { 
-                client = new AmazonDynamoDBClient(ddbConfig);
+            {
+                client = new AmazonDynamoDBClient(accessKey, secretAccessKey, token, ddbConfig);
             }
             catch (Exception ex)
             {
                 Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
                 return;
-            } 
+            }
 
             // get description references to all of our databases
             LoadTables();
