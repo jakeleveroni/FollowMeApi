@@ -34,34 +34,34 @@ namespace LogInManager
             {
                 try
                 {
-                    Logger.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Cognito client now...");
+                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Cognito client now...");
                     m_cognitoClient = new AmazonCognitoIdentityClient(Amazon.RegionEndpoint.USWest2);
                 }
                 catch (Exception ex)
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create Cognito client, " + ex.Message);
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create Cognito client, " + ex.Message);
                     return false;
                 }
 
                 try
                 {
-                    Logger.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Security token service client now...");
+                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Security token service client now...");
                     m_stsConfig = new AmazonSecurityTokenServiceConfig();
                 }
                 catch (Exception ex)
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create security token client, " + ex.Message);
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create security token client, " + ex.Message);
                     return false;
                 }
 
                 try
                 {
-                    Logger.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating DB reference now...");
+                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating DB reference now...");
                     m_db = new DB();
                 }
                 catch (Exception ex)
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create DB connection, " + ex.Message);
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create DB connection, " + ex.Message);
                     return false;
                 }
 
@@ -81,12 +81,12 @@ namespace LogInManager
 
                 if (users.Count > 1)
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : More than one user with that username and password exist");
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : More than one user with that username and password exist");
                     return null;
                 }
                 else if (users.Count == 0)
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][INFO] : No user information returned user does not exist");
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][INFO] : No user information returned user does not exist");
                     return null;
                 }
                 else
@@ -102,7 +102,7 @@ namespace LogInManager
                 }
                 else
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : User does not exist, must create a new account first");
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : User does not exist, must create a new account first");
                     return null;
                 }
 
@@ -112,7 +112,7 @@ namespace LogInManager
                 }
                 else
                 {
-                    Logger.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not get credentials from AWS");
+                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not get credentials from AWS");
                     return null;
                 }
             }
@@ -135,7 +135,7 @@ namespace LogInManager
                     }
                     catch (Exception ex)
                     {
-                        Logger.logger.Error("[REQ-COG-CREDS][ERROR] : Could not get session credentials, " + ex.Message);
+                        Utility.Tools.logger.Error("[REQ-COG-CREDS][ERROR] : Could not get session credentials, " + ex.Message);
                         return false;
                     }
                 }

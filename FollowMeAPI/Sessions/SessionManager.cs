@@ -38,7 +38,7 @@ namespace FollowMeAPI.Sessions
                 }
                 catch
                 {
-                    Logger.logger.Error("[SESSION-MANAGER][ERROR] : Could not remove the session, as it was not found");
+                    Utility.Tools.logger.Error("[SESSION-MANAGER][ERROR] : Could not remove the session, as it was not found");
                     return false;
                 }
             }

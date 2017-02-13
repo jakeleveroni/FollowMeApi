@@ -24,7 +24,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
+                Utility.Tools.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
             }
         }
 
@@ -37,7 +37,7 @@ namespace StorageManager.S3Wrapper
             }
             catch(Exception ex)
             {
-                Logger.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
+                Utility.Tools.logger.Error("[S3-CONSTRUCTOR][ERROR] : Could not create S3 client,) " + ex.Message);
             }
         }
 
@@ -58,7 +58,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[S3-UPLOAD_PROFILE_MAGE][ERROR] : Could not upload profile image, " + ex.Message);
+                Utility.Tools.logger.Error("[S3-UPLOAD_PROFILE_MAGE][ERROR] : Could not upload profile image, " + ex.Message);
             }
 
             return true;
@@ -73,7 +73,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload trip content, " + ex.Message);
+                Utility.Tools.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload trip content, " + ex.Message);
                 return false;
             }
 
@@ -93,7 +93,7 @@ namespace StorageManager.S3Wrapper
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload content, " + ex.Message);
+                Utility.Tools.logger.Error("[S3-UPLOAD_TRIP_CONTENT][ERROR] : Could not upload content, " + ex.Message);
             }
 
             return true;
@@ -119,11 +119,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-                    Logger.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS credentials are not valid");
+                    Utility.Tools.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-                    Logger.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS error message, " + amazonS3Exception.Message);
+                    Utility.Tools.logger.Error("[S3-GET_USER_PROFILE][ERROR] : AWS error message, " + amazonS3Exception.Message);
 				}
 
 				return null;
@@ -163,11 +163,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") ||amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
+                    Utility.Tools.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " +  amazonS3Exception.Message);
+                    Utility.Tools.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " +  amazonS3Exception.Message);
 				}
 			}
 
@@ -207,11 +207,11 @@ namespace StorageManager.S3Wrapper
 			{
 				if (amazonS3Exception.ErrorCode != null && (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId") || amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
 				{
-                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
+                    Utility.Tools.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS credentials are not valid");
 				}
 				else
 				{
-                    Logger.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " + amazonS3Exception.Message);
+                    Utility.Tools.logger.Error("[S3-GET_TRIP_CONTENTS][ERROR] : AWS error message, " + amazonS3Exception.Message);
 				}
 			}
 

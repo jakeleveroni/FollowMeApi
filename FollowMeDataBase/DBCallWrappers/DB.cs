@@ -40,7 +40,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
+                Utility.Tools.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+                Utility.Tools.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
+                Utility.Tools.logger.Error("\nError: failed to create a DynamoDB config; " + ex.Message);
                 return;
             }
 
@@ -78,7 +78,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+                Utility.Tools.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
         private void LoadTables()
         {
-            Logger.logger.Info("\n*** Retrieving table information ***");
+            Utility.Tools.logger.Info("\n*** Retrieving table information ***");
 
             try
             {
@@ -97,7 +97,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
+                Utility.Tools.logger.Error("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
                 return;
             }
         }
@@ -112,7 +112,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
+                Utility.Tools.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
                 return false;
             }
         }
@@ -168,11 +168,11 @@ namespace FollowMeDataBase.DBCallWrappers
                     updateExpression = "SET #UN = :newUserName";
                     break;
                 default:
-                    Logger.logger.Error("[UPDATE-USER][ERROR] : Invalid update option provided");
+                    Utility.Tools.logger.Error("[UPDATE-USER][ERROR] : Invalid update option provided");
                     return false;
             }
 
-            Logger.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
+            Utility.Tools.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
 
             var request = new UpdateItemRequest
             {
@@ -190,7 +190,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[UPDATE-USER][ERROR] : Could not update the user item, + " + ex.Message);
+                Utility.Tools.logger.Error("[UPDATE-USER][ERROR] : Could not update the user item, + " + ex.Message);
                 return false;
             }
         }
@@ -204,7 +204,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
+                Utility.Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
                 return false;
             }
         }
@@ -218,7 +218,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
+                Utility.Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
                 return false;
             }
         }
@@ -232,7 +232,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Utility.Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -247,7 +247,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Utility.Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return null;
             }
         }
@@ -262,7 +262,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Utility.Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return false;
             }
         }
@@ -277,7 +277,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+                Utility.Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
                 return false;
             }
         }
@@ -311,12 +311,12 @@ namespace FollowMeDataBase.DBCallWrappers
 
             try
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for user with username \'" + userName + "\'");
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for user with username \'" + userName + "\'");
                 response = client.Query(request);
             }
             catch (Exception ex)
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
                 return queryResults;
             }
 
@@ -362,12 +362,12 @@ namespace FollowMeDataBase.DBCallWrappers
 
             try
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with name \'" + name + "\'");
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with name \'" + name + "\'");
                 response = client.Query(request);
             }
             catch (Exception ex)
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
                 return queryResults;
             }
 
@@ -413,12 +413,12 @@ namespace FollowMeDataBase.DBCallWrappers
 
             try
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with UserName \'" + userName + "\'");
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with UserName \'" + userName + "\'");
                 response = client.Query(request);
             }
             catch (Exception ex)
             {
-                Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
                 return queryResults;
             }
 
@@ -450,7 +450,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[ADD NEW TRIP][ERROR] : Could not add trip to database, " + ex.Message);
+                Utility.Tools.logger.Error("[ADD NEW TRIP][ERROR] : Could not add trip to database, " + ex.Message);
                 return false;
             }
         }
@@ -474,11 +474,11 @@ namespace FollowMeDataBase.DBCallWrappers
                     updateExpression = "SET #TM = :newMileage";
                     break;
                 default:
-                    Logger.logger.Error("[UPDATE-TRIP][ERROR] : Invalid update option provided");
+                    Utility.Tools.logger.Error("[UPDATE-TRIP][ERROR] : Invalid update option provided");
                     return false;
             }
 
-            Logger.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
+            Utility.Tools.logger.Info("[UPDATE-USER][NOTE] : Query : " + updateExpression + " NEW-VALUE : " + newValue);
 
             var request = new UpdateItemRequest
             {
@@ -496,7 +496,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[UPDATE-TRIP][ERROR] : Could not update the user item, + " + ex.Message);
+                Utility.Tools.logger.Error("[UPDATE-TRIP][ERROR] : Could not update the user item, + " + ex.Message);
                 return false;
             }
         }
@@ -510,7 +510,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                Utility.Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
                 return false;
             }
         }
@@ -524,7 +524,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
+                Utility.Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from database, " + ex.Message);
                 return false;
             }
         }
@@ -538,7 +538,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Utility.Tools.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -553,7 +553,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Utility.Tools.logger.Error("[GET TRIP][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return null;
             }
         }
@@ -568,7 +568,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Utility.Tools.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return false;
             }
         }
@@ -583,7 +583,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
+                Utility.Tools.logger.Error("[TRIP EXISTS][ERROR] : Error occurred while locating trip, " + ex.Message);
                 return false;
             }
         }
@@ -614,12 +614,12 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				Logger.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for trips with name \'" + tripName + "\'");
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for trips with name \'" + tripName + "\'");
 				response = client.Query(request);
 			}
 			catch (Exception ex)
 			{
-				Logger.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
+                Utility.Tools.logger.Info("[DB-CALL-WRAPPER][ERROR] : Query failed, " + ex.Message);
 				return queryResults;
 			}
 

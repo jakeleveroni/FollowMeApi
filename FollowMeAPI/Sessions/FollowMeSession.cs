@@ -47,7 +47,7 @@ namespace FollowMeAPI.Sessions
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[SESSION][ERROR] : Could not create the sessions log in manager or authenticate user, " + ex.Message);
+                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create the sessions log in manager or authenticate user, " + ex.Message);
                 return;
             }
 
@@ -60,7 +60,7 @@ namespace FollowMeAPI.Sessions
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[SESSION][ERROR] : Could not create the sessions database connection or could not retrieve specified user, " + ex.Message);
+                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create the sessions database connection or could not retrieve specified user, " + ex.Message);
                 return;
             }
 
@@ -71,7 +71,7 @@ namespace FollowMeAPI.Sessions
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[SESSION][ERROR] : Could not create db or s3 context for user, " + ex.Message);
+                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create db or s3 context for user, " + ex.Message);
                 return;
             }
             

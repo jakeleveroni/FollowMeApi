@@ -16,13 +16,13 @@ namespace FollowMeAPI.Controllers
             try
             {
                 var str = WebApiApplication.db.GetTrip(tripId);
-                
-                Logger.logger.Debug("Serialized Object : " + str);
+
+                Utility.Tools.logger.Debug("Serialized Object : " + str);
                 return str;
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
+                Utility.Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
                 return string.Empty;
             }
         }
@@ -39,7 +39,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
+                Utility.Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
                 return false;
             }
         }
@@ -55,7 +55,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
+                Utility.Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
                 return false;
             }
         }
@@ -86,7 +86,7 @@ namespace FollowMeAPI.Controllers
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
+                Utility.Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
                 return false;
             }
         }

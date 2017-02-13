@@ -10,7 +10,7 @@ namespace FollowMeAPI
         {
             // enable log4net logging for debugging
             BasicConfigurator.Configure();
-            Utility.Logger.logger.Info("[APPLICATION START]");
+            Utility.Tools.logger.Info("[APPLICATION START]");
 
             // Web API routes
             config.MapHttpAttributeRoutes();

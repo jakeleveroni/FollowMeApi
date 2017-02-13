@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Web.Http;
+using System.Linq;
 using FollowMeDataBase.Models;
-using Newtonsoft.Json;
 using Utility;
+using System.Collections.Generic;
 
 namespace FollowMeAPI.Controllers
 {
@@ -11,102 +12,155 @@ namespace FollowMeAPI.Controllers
     public class UsersController : ApiController
     {
         [HttpGet]
-        [Route("{userId:guid}")]
-        public string GetUserModel(string userId)
+        [Route("get")]
+        public string GetUserModel()
         {
-            try
+            string userId = string.Empty;
+
+            if (Request.Headers.Contains("guid"))
             {
-                var str = WebApiApplication.db.GetUser(userId);
-                Logger.logger.Debug("Serialized Object : " + str);
-                return str;
+                userId = Request.Headers.GetValues("guid").FirstOrDefault();     
             }
-            catch (Exception ex)
+
+            if (userId != null)
             {
-                Logger.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
-                return string.Empty;
+                try
+                {
+                    var str = WebApiApplication.db.GetUser(userId);
+                    Tools.logger.Debug("Serialized Object : " + str);
+                    return str;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
+                    return string.Empty;
+                } 
             }
+
+            return string.Empty;
         }
 
         [HttpPost]
-        [Route("{userJson}")]
-        public bool PostUserModel(string jsonUser)
+        [Route("new")]
+        public bool PostUserModel([FromBody] UserModel jsonUser)
         {
             try
             {
-                UserModel user = JsonConvert.DeserializeObject<UserModel>(jsonUser);
-                WebApiApplication.db.AddNewUser(user);
+                WebApiApplication.db.AddNewUser(jsonUser);
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
+                Tools.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
                 return false;
             }
         }
 
         [HttpDelete]
-        [Route("{userId:guid}")]
-        public bool DeleteUserModel(string userId)
+        [Route("delete")]
+        public bool DeleteUserModel()
         {
-            try
+            string userId = string.Empty;
+
+            if (Request.Headers.Contains("guid"))
             {
-                WebApiApplication.db.RemoveUser(userId);
-                return true;
+                userId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
-            catch (Exception ex)
+
+            if (userId != null)
             {
-                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
-                return false;
+                try
+                {
+                    WebApiApplication.db.RemoveUser(userId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                    return false;
+                } 
             }
+
+            return false;
         }
 
         [HttpPatch]
-        [Route("update/{userId:guid}/{key:minlength(1)}/{value:minlength(1)}/")]
-        public bool PatchUserModel(string userId, string key, string value)
+        [Route("update")]
+        public bool PatchUserModel()
         {
-            UserItemEnums updateType;
-            System.Diagnostics.Debug.WriteLine("HIT IT!");
-            // convert key to type of updating 
-            switch (key)
+            string userId = null;
+            Dictionary<string, string> kvp = new Dictionary<string, string>();
+
+            if (Request.Headers.Contains("guid"))
             {
-                case "Name":
-                    updateType = UserItemEnums.UpdateName;
-                    break;
-                case "Email":
-                    updateType = UserItemEnums.UpdateEmail;
-                    break;
-                case "BirthDate":
-                    updateType = UserItemEnums.UpdateBirthDate;
-                    break;
-                case "NumberOfTrips":
-                    updateType = UserItemEnums.UpdateNumberOfTrips;
-                    break;
-                case "Password":
-                    updateType = UserItemEnums.UpdatePassword;
-                    break;
-                case "TotalMilesTraveled":
-                    updateType = UserItemEnums.UpdateMilesTraveled;
-                    break;
-                case "UserName":
-                    updateType = UserItemEnums.UpdateUserName;
-                    break;
-                case "TripIds":
-                    updateType = UserItemEnums.UpdateTrips;
-                    break;
-                default:
-                    return false;
+                userId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            try
-            { 
-                WebApiApplication.db.UpdateUser(userId, value, updateType);
-                return true;
-            }
-            catch (Exception ex)
+            if (userId == null)
             {
-                Logger.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
                 return false;
             }
+
+            // the header is parsed out this way because the header collection is implemented in 
+            // a fucking stupid way where you cant get the keys of the header, they are just hard coded string 
+            // comparisons on the header collection. Fucking unbelievable...
+            if (Request.Headers.Contains("Name"))
+            {
+                kvp.Add("Name", Request.Headers.GetValues("Name").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Email"))
+            {
+                kvp.Add("Email", Request.Headers.GetValues("Email").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("BirthDate"))
+            {
+                kvp.Add("BirthDate", Request.Headers.GetValues("BirthDate").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("NumberOfTrips"))
+            {
+                kvp.Add("NumberOfTrips", Request.Headers.GetValues("NumberOfTrips").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Password"))
+            {
+                kvp.Add("Password", Request.Headers.GetValues("Password").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("TotalMilesTraveled"))
+            {
+                kvp.Add("TotalMilesTraveled", Request.Headers.GetValues("TotalMilesTraveled").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("UserName"))
+            {
+                kvp.Add("UserName", Request.Headers.GetValues("UserName").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("TripIds"))
+            {
+                kvp.Add("TripIds", Request.Headers.GetValues("TripIds").FirstOrDefault());
+            }
+
+            if (kvp.Count > 0)
+            {
+                try
+                {
+
+                    foreach (KeyValuePair<string, string> entry in kvp)
+                    {
+                        UserItemEnums updateType = Tools.GetUserUpdateEnum(entry.Key);
+
+                        if (updateType != UserItemEnums.InvalidUpdate && entry.Value != null)
+                        {
+                            WebApiApplication.db.UpdateUser(userId, entry.Value, updateType);
+                            return true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                    return false;
+                } 
+            }
+
+            return false;
         }
     }
 }
