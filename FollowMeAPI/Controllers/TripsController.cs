@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Web.Http;
+using System.Linq;
+using System.Collections.Generic;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
 using Utility;
@@ -10,85 +12,126 @@ namespace FollowMeAPI.Controllers
     public class TripsController : ApiController
     {
         [HttpGet]
-        [Route("{tripId:guid}")]
-        public string GetTripModel(string tripId)
+        [Route("get")]
+        public string GetTripModel()
         {
-            try
-            {
-                var str = WebApiApplication.db.GetTrip(tripId);
+            string tripId = null;
 
-                Utility.Tools.logger.Debug("Serialized Object : " + str);
-                return str;
-            }
-            catch (Exception ex)
+            if (Request.Headers.Contains("guid"))
             {
-                Utility.Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
-                return string.Empty;
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
+
+            if (tripId != null)
+            {
+                try
+                {
+                    var str = WebApiApplication.db.GetTrip(tripId);
+                    Tools.logger.Debug("Serialized Object : " + str);
+                    return str;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
+                }
+            }
+
+            return null;
         }
 
         [HttpPost]
-        [Route("{tripJson}")]
-        public bool PostTripModel(string tripJson)
+        [Route("new")]
+        public bool PostTripModel([FromBody] TripModel tripJson)
         {
             try
             {
-                TripModel trip = JsonConvert.DeserializeObject<TripModel>(tripJson);
-                WebApiApplication.db.AddNewTrip(trip);
+                WebApiApplication.db.AddNewTrip(tripJson);
                 return true;
             }
             catch (Exception ex)
             {
-                Utility.Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
+                Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
                 return false;
             }
         }
 
         [HttpDelete]
-        [Route("{tripId:guid}")]
-        public bool DeleteTripModel(string tripId)
+        [Route("delete")]
+        public bool DeleteTripModel()
         {
-            try
+            string tripId= string.Empty;
+
+            if (Request.Headers.Contains("guid"))
             {
-                WebApiApplication.db.RemoveTrip(tripId);
-                return true;
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
-            catch (Exception ex)
+
+            if (tripId != null)
             {
-                Utility.Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
-                return false;
+                try
+                {
+                    WebApiApplication.db.RemoveTrip(tripId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
+                }
             }
+
+            return false;
         }
 
         [HttpPatch]
-        [Route("update/{tripId:guid}/{key:minlength(1)}/{value:minlength(1)}/")]
-        public bool PatchTripModel(string tripId, string key, string value)
+        [Route("update")]
+        public bool PatchTripModel()
         {
-            TripItemEnums updateType;
+            string tripId = null;
+            Dictionary<string, string> kvp = new Dictionary<string, string>();
 
-            // convert key to type of updating 
-            switch (key)
+            if (Request.Headers.Contains("guid"))
             {
-                case "TripName":
-                    updateType = TripItemEnums.UpdateTripName;
-                    break;
-                case "Mileage":
-                    updateType = TripItemEnums.UpdateTripMileage;
-                    break;
-                default:
-                    return false;
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            try
+            if (tripId == null)
             {
-                WebApiApplication.db.UpdateTrip(tripId, value, updateType);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Utility.Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
                 return false;
             }
+
+            if (Request.Headers.Contains("TripName"))
+            {
+                kvp.Add("TripName", Request.Headers.GetValues("TripName").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Mileage"))
+            {
+                kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
+            }
+
+            if (kvp.Count > 0)
+            {
+                try
+                {
+                    foreach (KeyValuePair<string, string> entry in kvp)
+                    {
+                        TripItemEnums updateType = Tools.GetTripItemEnum(entry.Key);
+
+                        if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
+                        {
+                            WebApiApplication.db.UpdateTrip(tripId, entry.Value, updateType);
+                            return true;
+                        }
+                    }
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
+                } 
+            }
+
+            return false;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace FollowMeAPI.Controllers
         [Route("get")]
         public string GetUserModel()
         {
-            string userId = string.Empty;
+            string userId = null;
 
             if (Request.Headers.Contains("guid"))
             {
@@ -33,11 +33,10 @@ namespace FollowMeAPI.Controllers
                 catch (Exception ex)
                 {
                     Tools.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
-                    return string.Empty;
                 } 
             }
 
-            return string.Empty;
+            return null;
         }
 
         [HttpPost]
@@ -77,7 +76,6 @@ namespace FollowMeAPI.Controllers
                 catch (Exception ex)
                 {
                     Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
-                    return false;
                 } 
             }
 

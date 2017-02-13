@@ -12,13 +12,29 @@ namespace FollowMeAPI.Controllers
     public class LoginController : ApiController
     {
         [HttpGet]
-        [Route("{username}/{password}")]
-        public FollowMeSession LogInUser(string userName, string password)
+        [Route("auth")]
+        public FollowMeSession LogInUser()
         {
-            FollowMeSession session = new FollowMeSession(userName, password);
-            SessionManager.AddNewSession(session);
+            string userName = null;
+            string password = null;
 
-            return session;
+            if (Request.Headers.Contains("UserName") && Request.Headers.Contains("Password"))
+            {
+                userName = Request.Headers.GetValues("UserName").FirstOrDefault();
+                password = Request.Headers.GetValues("Password").FirstOrDefault();
+            }
+
+            if (userName == null || password == null)
+            {
+                return null;
+            }
+            else
+            {
+                FollowMeSession session = new FollowMeSession(userName, password);
+                SessionManager.AddNewSession(session);
+
+                return session;
+            }
         }
     }
 }

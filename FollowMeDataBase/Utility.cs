@@ -51,5 +51,18 @@ namespace Utility
                     return UserItemEnums.InvalidUpdate;
             }
         }
+
+        public static TripItemEnums GetTripItemEnum(string val)
+        {
+            switch (val)
+            {
+                case "Name":
+                    return TripItemEnums.UpdateTripName;
+                case "TripMile":
+                    return TripItemEnums.UpdateTripMileage;
+                default:
+                    return TripItemEnums.InvalidUpdate;
+            }
+        }
     }
 }

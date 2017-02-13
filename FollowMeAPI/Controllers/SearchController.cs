@@ -26,7 +26,7 @@ namespace FollowMeAPI.Controllers
 			}
 			catch (Exception ex)
 			{
-                Utility.Tools.logger.Error("[SEARCH-USERS (BY-NAME)][ERROR] : Error while searching users by name, " + ex.Message);
+                Tools.logger.Error("[SEARCH-USERS (BY-NAME)][ERROR] : Error while searching users by name, " + ex.Message);
 				return new List<string>();
 			}
 
@@ -40,7 +40,7 @@ namespace FollowMeAPI.Controllers
 			}
 			catch (Exception ex)
 			{
-                Utility.Tools.logger.Error("[SEARCH-USERS (BY-USERNAME)][ERROR] : Error while searching users by UserName, " + ex.Message);
+                Tools.logger.Error("[SEARCH-USERS (BY-USERNAME)][ERROR] : Error while searching users by UserName, " + ex.Message);
 				return new List<string>();
 			}
 
@@ -63,7 +63,7 @@ namespace FollowMeAPI.Controllers
 			}
 			catch (Exception ex)
 			{
-                Utility.Tools.logger.Error("[SEARCH-TRIPS][ERROR] : Error while searching trips by name, " + ex.Message);
+                Tools.logger.Error("[SEARCH-TRIPS][ERROR] : Error while searching trips by name, " + ex.Message);
 				return new List<string>();
 			}
 
