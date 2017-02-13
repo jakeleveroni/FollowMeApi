@@ -8,10 +8,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.config
 
-# WEB C# project files
-FollowMeDataBase/App.config
-FollowMeAPI/Web.config
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
