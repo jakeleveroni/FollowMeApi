@@ -88,7 +88,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
         private void LoadTables()
         {
-            Utility.Tools.logger.Info("\n*** Retrieving table information ***");
+            Tools.logger.Info("\n*** Retrieving table information ***");
 
             try
             {
@@ -97,7 +97,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Utility.Tools.logger.Error("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
+                Tools.logger.Error("[LOAD TABLES][ERROR] : Could not load either the user or trip table, " + ex.Message);
                 return;
             }
         }
@@ -112,7 +112,7 @@ namespace FollowMeDataBase.DBCallWrappers
             }
             catch (Exception ex)
             {
-                Utility.Tools.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
+                Tools.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
                 return false;
             }
         }

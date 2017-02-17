@@ -41,17 +41,17 @@ namespace FollowMeAPI.Controllers
 
         [HttpPost]
         [Route("new")]
-        public bool PostTripModel([FromBody] TripModel tripJson)
+        public string PostTripModel([FromBody] TripModel tripJson)
         {
             try
             {
                 WebApiApplication.db.AddNewTrip(tripJson);
-                return true;
+                return "Successfully added trip to db";
             }
             catch (Exception ex)
             {
                 Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
-                return false;
+                return ex.Message;
             }
         }
 

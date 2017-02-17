@@ -38,18 +38,31 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("TripDescription")]
         public string TripDescription { get; set; }
 
+        [DataMember(Name = "Participants")]
+        [DynamoDBProperty("Participants")]
+        public List<Guid> Participants { get; set; }
+
         // METHODS
         public TripModel()
         {
-
+            Participants = new List<Guid>();
         }
 
-        public TripModel(Guid id, string name, ulong miles, string desc)
+        public TripModel(Guid id, string name, ulong miles, string desc, List<Guid> participants = null)
         {
             TripId = id;
             TripName = name;
             TripMileage = miles;
             TripDescription = desc;
+
+            if (participants != null)
+            {
+                Participants = new List<Guid>(participants);
+            }
+            else
+            {
+                Participants = new List<Guid>();
+            }
         }
 
         public TripModel(TripModel other)
@@ -58,6 +71,7 @@ namespace FollowMeDataBase.Models
             TripName = other.TripName;
             TripMileage = other.TripMileage;
             TripDescription = other.TripDescription;
+            Participants = other.Participants;
         }
 
         public string SerializeToJson()
@@ -80,8 +94,31 @@ namespace FollowMeDataBase.Models
         public static bool operator ==(TripModel a, TripModel b)
         {
             if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && 
-                a.TripName == b.TripName && a.TripDescription == b.TripDescription)
+                a.TripName == b.TripName && a.TripDescription == b.TripDescription &&
+                a.Participants == b.Participants)
             {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool AddNewParticipant(Guid userId)
+        {
+            if (!Participants.Contains(userId))
+            {
+                Participants.Add(userId);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RemoveParticipant(Guid userId)
+        {
+            if (Participants.Contains(userId))
+            {
+                Participants.Remove(userId);
                 return true;
             }
 

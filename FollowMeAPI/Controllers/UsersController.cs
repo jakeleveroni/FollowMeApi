@@ -15,7 +15,7 @@ namespace FollowMeAPI.Controllers
         [Route("get")]
         public string GetUserModel()
         {
-            string userId = null;
+              string userId = null;
 
             if (Request.Headers.Contains("guid"))
             {
@@ -41,17 +41,17 @@ namespace FollowMeAPI.Controllers
 
         [HttpPost]
         [Route("new")]
-        public bool PostUserModel([FromBody] UserModel jsonUser)
+        public string PostUserModel([FromBody] UserModel jsonUser)
         {
             try
             {
                 WebApiApplication.db.AddNewUser(jsonUser);
-                return true;
+                return jsonUser.ToString();
             }
             catch (Exception ex)
             {
                 Tools.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
-                return false;
+                return (ex.Message + "\t" + jsonUser);
             }
         }
 

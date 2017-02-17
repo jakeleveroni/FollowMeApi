@@ -59,6 +59,11 @@ namespace FollowMeDataBase.Models
         [DataMember(Name = "TotalMilesTraveled")]
         [DynamoDBProperty("TotalMilesTraveled")]
         public ulong TotalMilesTraveled { get; set; }
+        
+        [DataMember(Name = "Friends")]
+        [DynamoDBProperty("Friends")]
+        public List<Guid> Friends { get; set; }
+
 
         // METHODS
         public UserModel()
@@ -75,10 +80,11 @@ namespace FollowMeDataBase.Models
             Password = pass;
             BirthDate = bd.ToString();
             TripIds = new List<string>();
+            Friends = new List<Guid>();
             TotalMilesTraveled = miles;
         }
 
-        public UserModel(Guid id, string userName, string name, string email, string pass, List<string> trips, DateTime bd, ulong miles)
+        public UserModel(Guid id, string userName, string name, string email, string pass, DateTime bd, ulong miles, List<Guid> friends = null, List<string> trips = null)
         {
             UserId = id;
             UserName = userName;
@@ -86,9 +92,26 @@ namespace FollowMeDataBase.Models
             Email = email;
             Password = pass;
             BirthDate = bd.ToString();
-            TripIds = trips;
             NumberOfTrips = (uint)TripIds.Count;
             TotalMilesTraveled = miles;
+
+            if (friends != null)
+            {
+                Friends = new List<Guid>(friends);
+            }
+            else
+            {
+                friends = new List<Guid>();
+            }
+
+            if (trips != null)
+            {
+                TripIds = new List<string>(trips);
+            }
+            else
+            {
+                TripIds = new List<string>();
+            }
         }
 
         public UserModel(UserModel other)
@@ -99,6 +122,7 @@ namespace FollowMeDataBase.Models
             Email = other.Email;
             Password = other.Password;
             TripIds = new List<string>(other.TripIds);
+            Friends = new List<Guid>(other.Friends);
             BirthDate = other.BirthDate.ToString();
             TotalMilesTraveled = other.TotalMilesTraveled;
         }
@@ -119,6 +143,28 @@ namespace FollowMeDataBase.Models
             if (TripIds.Contains(trip))
             {
                 TripIds.RemoveAt(TripIds.IndexOf(trip));
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool AddNewFriend(Guid friendId)
+        {
+            if (!Friends.Contains(friendId))
+            {
+                Friends.Add(friendId);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RemoveFriend(Guid friendId)
+        {
+            if (Friends.Contains(friendId))
+            {
+                Friends.Remove(friendId);
                 return true;
             }
 
@@ -166,7 +212,7 @@ namespace FollowMeDataBase.Models
                 tripIds.Add(obj["TripIds"].L[i].S);
             }
 
-            return new UserModel(new Guid(id), userName, name, email, pass, tripIds, bday, totalMiles);
+            return new UserModel(new Guid(id), userName, name, email, pass, bday, totalMiles, null, tripIds);
         }
 
         public static bool operator ==(UserModel a, UserModel b)
@@ -180,7 +226,7 @@ namespace FollowMeDataBase.Models
                 a.Name == b.Name && a.Email == b.Email && 
                 a.Password == b.Password && a.BirthDate == b.BirthDate &&
                 a.TotalMilesTraveled == b.TotalMilesTraveled && a.NumberOfTrips == b.NumberOfTrips &&
-                a.TripIds == b.TripIds)
+                a.TripIds == b.TripIds && a.Friends == b.Friends)
             {
                 return true;
             }

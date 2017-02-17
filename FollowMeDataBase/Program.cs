@@ -42,11 +42,11 @@ namespace FollowMeDataBase
             //l3 = db.QueryUsersByUserName("drew.cortright");
             //l4 = db.QueryUsersByUserName("jacob.leveroni");
 
-            //UserModel um = new UserModel(Guid.NewGuid(), "jleveroni", "jacob", "jake@fm.com", "pass", new DateTime(), 100);
-            //Console.WriteLine(um.SerializeToJson());
+            UserModel um = new UserModel(Guid.NewGuid(), "jleveroni", "jacob", "jake@fm.com", "pass", new DateTime(), 100);
+            Console.WriteLine(um.SerializeToJson());
 
-            ////Console.WriteLine("Press any key to exit...");
-            //Console.Read();
+            //Console.WriteLine("Press any key to exit...");
+            Console.Read();
         }
     }
 }
