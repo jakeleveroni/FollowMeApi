@@ -174,9 +174,16 @@ namespace FollowMeDataBase.Models
         public Dictionary<string, AttributeValue> FormatUserForDB()
         {
             Dictionary<string, AttributeValue> tripIdAttr = new Dictionary<string, AttributeValue>();
+            Dictionary<string, AttributeValue> friendsAttr = new Dictionary<string, AttributeValue>();
+
             foreach (var trip in TripIds)
             {
                 tripIdAttr.Add("TripId", new AttributeValue(trip));
+            }
+
+            foreach(var friend in Friends)
+            {
+                friendsAttr.Add("Friend", new AttributeValue(friend.ToString()));
             }
 
             return new Dictionary<string, AttributeValue>()
@@ -189,7 +196,8 @@ namespace FollowMeDataBase.Models
                 { "BirthDate", new AttributeValue { S = BirthDate.ToString() } },
                 { "TotalMilesTraveled", new AttributeValue { N = TotalMilesTraveled.ToString() } },
                 { "NumberOfTrips", new AttributeValue { N = NumberOfTrips.ToString() } },
-                { "Trips", new AttributeValue { M = tripIdAttr } }
+                { "Trips", new AttributeValue { M = tripIdAttr } },
+                { "Friends", new AttributeValue {M =  friendsAttr } }
             };
 
         }
@@ -212,7 +220,14 @@ namespace FollowMeDataBase.Models
                 tripIds.Add(obj["TripIds"].L[i].S);
             }
 
-            return new UserModel(new Guid(id), userName, name, email, pass, bday, totalMiles, null, tripIds);
+            List<Guid> friends = new List<Guid>();
+
+            for (int i = 0; i < obj["Friends"].L.Count; ++i)
+            {
+                friends.Add(new Guid(obj["Friends"].L[i].S));
+            }
+
+            return new UserModel(new Guid(id), userName, name, email, pass, bday, totalMiles, friends, tripIds);
         }
 
         public static bool operator ==(UserModel a, UserModel b)

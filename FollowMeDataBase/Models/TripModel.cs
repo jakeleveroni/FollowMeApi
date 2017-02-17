@@ -88,7 +88,14 @@ namespace FollowMeDataBase.Models
 			ulong miles;
 			ulong.TryParse(mileage, out miles);
 
-			return new TripModel(new Guid(id), name, miles, desc);
+            List<Guid> participants = new List<Guid>();
+
+            for (int i = 0; i < obj["Participants"].L.Count; ++i)
+            {
+                participants.Add(new Guid(obj["Participants"].L[i].S));
+            }
+
+            return new TripModel(new Guid(id), name, miles, desc);
 		}
 
         public static bool operator ==(TripModel a, TripModel b)
