@@ -6,7 +6,6 @@ using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
 using FollowMeDataBase.Models;
 using FollowMeDataBase.DBCallWrappers;
-using Newtonsoft.Json;
 using Utility;
 
 // TODO This is untested code for signing in and requesting credentials through cognito.
@@ -21,73 +20,48 @@ namespace LogInManager
         {
             AmazonSecurityTokenServiceConfig m_stsConfig;
             private AmazonCognitoIdentityClient m_cognitoClient;
-            private DB m_db;
+            private DB m_tmpDB;
             private string m_userPool;
             private string m_federationId;
+            public string UserName { get; }
+            public string Password { get; }
 
-            public CustomLogInManager()
+            public CustomLogInManager(string userName, string password)
             {
-                Initialize();
-            }
-
-            public bool Initialize()
-            {
-                try
-                {
-                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Cognito client now...");
-                    m_cognitoClient = new AmazonCognitoIdentityClient(Amazon.RegionEndpoint.USWest2);
-                }
-                catch (Exception ex)
-                {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create Cognito client, " + ex.Message);
-                    return false;
-                }
-
-                try
-                {
-                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating Security token service client now...");
-                    m_stsConfig = new AmazonSecurityTokenServiceConfig();
-                }
-                catch (Exception ex)
-                {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create security token client, " + ex.Message);
-                    return false;
-                }
-
-                try
-                {
-                    Utility.Tools.logger.Info("[CUSTOM-LOGIN-MANAGER][NOTE] : Creating DB reference now...");
-                    m_db = new DB();
-                }
-                catch (Exception ex)
-                {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create DB connection, " + ex.Message);
-                    return false;
-                }
-
-                return true;
-
+                UserName = userName;
+                Password = password;
             }
 
             // returns the auth info for the user, the auth info will have 
             // a false Authenticated value if query fails
-            public AuthInfo AuthenticateUserInApp(string username, string password)
+            public AuthInfo AuthenticateUserInApp()
             {
                 UserModel um = null;
                 List<UserModel> users = new List<UserModel>();
                 AuthInfo authInfo = new AuthInfo();
 
-                users = m_db.QueryUsersByUserNameAndPassword(username, password);
+                try
+                {
+                    using (m_tmpDB = new DB())
+                    {
+                        users = m_tmpDB.QueryUsersByUserNameAndPassword(UserName, Password);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not create the temporary Database accessor, " + ex.Message);
+                    return new AuthInfo(FolloMeErrorCodes.Uninitialized);
+                }
 
                 if (users.Count > 1)
                 {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : More than one user with that username and password exist");
-                    return null;
+                    Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : More than one user with that username and password exist, THIS SHOULD NEVER HAPPEN");
+                    return new AuthInfo(FolloMeErrorCodes.MultipleUsersFound);
                 }
                 else if (users.Count == 0)
                 {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][INFO] : No user information returned user does not exist");
-                    return null;
+                    Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][INFO] : No user information returned user does not exist, create an account or verify you entered the correct credentials");
+                    return new AuthInfo(FolloMeErrorCodes.NoAccountExists);
                 }
                 else
                 {
@@ -96,24 +70,25 @@ namespace LogInManager
 
                 if (um != null)
                 {
-                    authInfo = new AuthInfo(username, password, um.UserId.ToString());
+                    authInfo = new AuthInfo(UserName, Password, um.UserId.ToString(), FolloMeErrorCodes.APIVerified);
                     authInfo.UserExists = true;
                     authInfo.Authenticated = true;
                 }
                 else
                 {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : User does not exist, must create a new account first");
-                    return null;
+                    Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : User does not exist, must create a new account first");
+                    return new AuthInfo(FolloMeErrorCodes.NotAPIVerified);
                 }
 
                 if (RequestCognitoCredentials(authInfo))
                 {
+                    authInfo.StatusCode = FolloMeErrorCodes.AWSAndAPIVerified;
                     return authInfo;
                 }
                 else
                 {
-                    Utility.Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not get credentials from AWS");
-                    return null;
+                    Tools.logger.Error("[CUSTOM-LOGIN-MANAGER][ERROR] : Could not get credentials from AWS");
+                    return authInfo;
                 }
             }
 
@@ -123,19 +98,19 @@ namespace LogInManager
                 {
                     try
                     {
+                        // auth user through FolloMe federation idfentities
                         GetSessionTokenRequest sessionTokenReq = new GetSessionTokenRequest();
-
                         Credentials creds = stsClient.GetSessionToken(sessionTokenReq).Credentials;
-
                         SessionAWSCredentials sessionCreds = new SessionAWSCredentials(creds.AccessKeyId, creds.SecretAccessKey, creds.SessionToken);
 
                         authInfo.AWSCredentials = new AWSAuthInfo(creds.AccessKeyId, creds.SecretAccessKey, creds.SessionToken);
-
+                        authInfo.StatusCode = FolloMeErrorCodes.AWSVerified;
                         return true;
                     }
                     catch (Exception ex)
                     {
-                        Utility.Tools.logger.Error("[REQ-COG-CREDS][ERROR] : Could not get session credentials, " + ex.Message);
+                        Tools.logger.Error("[REQ-COG-CREDS][ERROR] : Could not get session credentials, " + ex.Message);
+                        authInfo.StatusCode = FolloMeErrorCodes.NotAWSVerified;
                         return false;
                     }
                 }
@@ -144,7 +119,7 @@ namespace LogInManager
             public void Dispose()
             {
                 m_cognitoClient.Dispose();
-                m_db.Dispose();
+                m_tmpDB.Dispose();
             }
         }
     }

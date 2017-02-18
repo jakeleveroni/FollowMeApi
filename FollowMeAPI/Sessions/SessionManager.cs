@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.SessionState;
-using System.Linq;
-using System.Web;
 using Utility;
 
 namespace FollowMeAPI.Sessions
@@ -38,7 +36,7 @@ namespace FollowMeAPI.Sessions
                 }
                 catch
                 {
-                    Utility.Tools.logger.Error("[SESSION-MANAGER][ERROR] : Could not remove the session, as it was not found");
+                    Tools.logger.Error("[SESSION-MANAGER][ERROR] : Could not remove the session, as it was not found");
                     return false;
                 }
             }

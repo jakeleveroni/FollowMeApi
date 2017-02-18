@@ -24,6 +24,24 @@ namespace Utility
         InvalidUpdate,
     }
 
+    public enum FolloMeErrorCodes
+    {
+        NoAccountExists = 0,
+        AccountExists,
+        APIVerified,
+        AWSVerified,
+        AWSAndAPIVerified,
+        NotAWSVerified,
+        NotAPIVerified,
+        Uninitialized,
+        MultipleUsersFound,
+        NoCredentialsProvided,
+        NoError,
+        LogInFailed,
+        LogInSucceded,
+    }
+
+
     public static class Tools
     {
         // logger used for log4net debug logging on IIS
@@ -71,4 +89,26 @@ namespace Utility
             }
         }
     }
+
+    public class FolloMeResponse
+    {
+        public int ErrorCode { get; set; }
+        public FolloMeErrorCodes FolloMeErrorCode { get; set; }
+        public string Message { get; set; }
+
+        public FolloMeResponse()
+        {
+            ErrorCode = 000;
+            FolloMeErrorCode = 000;
+            Message = "Uninitialized error message";
+        }
+
+        public FolloMeResponse(int err, FolloMeErrorCodes FMerr, string msg)
+        {
+            ErrorCode = err;
+            FolloMeErrorCode = FMerr;
+            Message = msg;
+        }
+    }
+
 }

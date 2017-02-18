@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Web.Http;
 using FollowMeAPI.Sessions;
+using Utility;
 
 namespace FollowMeAPI.Controllers
 {
@@ -13,7 +10,7 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("auth")]
-        public FollowMeSession LogInUser()
+        public FolloMeResponse LogInUser()
         {
             string userName = null;
             string password = null;
@@ -26,14 +23,23 @@ namespace FollowMeAPI.Controllers
 
             if (userName == null || password == null)
             {
-                return null;
+                return new FolloMeResponse(404, FolloMeErrorCodes.NoCredentialsProvided, "Either the username or password provided were null");
             }
             else
             {
                 FollowMeSession session = new FollowMeSession(userName, password);
-                SessionManager.AddNewSession(session);
+                session.CreateUserSession();
 
-                return session;
+                if (session.IsAuthed())
+                {
+                    SessionManager.AddNewSession(session);
+                    return new FolloMeResponse(200, FolloMeErrorCodes.LogInSucceded, "Successfully logged in to the API and gained temporary AWS Credentials");
+                }
+                else
+                {
+                    return new FolloMeResponse(404, session.AuthenticationCreds.StatusCode, "Authentication failed, see follow me error code for more information");
+                }
+
             }
         }
     }

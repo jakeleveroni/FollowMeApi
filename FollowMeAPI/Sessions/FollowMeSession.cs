@@ -13,9 +13,6 @@ namespace FollowMeAPI.Sessions
 {
     public class FollowMeSession
     {
-        // Login manager used for gettting user temporary AWS credentials
-        private CustomLogInManager m_loginManager;
-
         // SessionIdManager used for generating session ids
         private SessionIDManager m_sessionManager;
 
@@ -23,7 +20,7 @@ namespace FollowMeAPI.Sessions
         public string SessionId;
 
         // All authentication credentials both for the API as well as temporary AWS credentials
-        public AuthInfo AuthenticationCreds { get; }
+        public AuthInfo AuthenticationCreds { get; set; }
 
         // users custom gateway to the db
         public DB DBManager;
@@ -34,48 +31,42 @@ namespace FollowMeAPI.Sessions
         // users data model
         public UserModel User;
 
+        private string m_userName;
+        private string m_password;
+
+        // user aws token 
+
+
         // constructor, creates a complete user session 
         public FollowMeSession(string userName, string password)
         {
+            m_userName = userName;
+            m_password = password;
+        }
+
+        public AuthInfo CreateUserSession()
+        {
             AuthenticationCreds = null;
-            m_sessionManager = new SessionIDManager();
 
-            try
+            using (CustomLogInManager loginManager = new CustomLogInManager(m_userName, m_password))
             {
-                m_loginManager = new CustomLogInManager();
-                AuthenticationCreds = m_loginManager.AuthenticateUserInApp(userName, password);
-            }
-            catch (Exception ex)
-            {
-                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create the sessions log in manager or authenticate user, " + ex.Message);
-                return;
-            }
+                AuthenticationCreds = loginManager.AuthenticateUserInApp();
 
-            try 
-            {
-                if (AuthenticationCreds != null)
+                if (AuthenticationCreds.StatusCode == FolloMeErrorCodes.AWSAndAPIVerified)
                 {
-                    User = JsonConvert.DeserializeObject<UserModel>(WebApiApplication.db.GetUser(AuthenticationCreds.Id));
+                    return AuthenticationCreds;
+                }
+                else
+                {
+                    Tools.logger.Error("[FOLLOW-ME-SESSION][ERROR] : Could not authenticate the users credentials, FolloMeErrorCode - " + AuthenticationCreds.StatusCode);
+                    return AuthenticationCreds;
                 }
             }
-            catch (Exception ex)
-            {
-                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create the sessions database connection or could not retrieve specified user, " + ex.Message);
-                return;
-            }
+        }
 
-            try
-            {
-                DBManager = new DB(AuthenticationCreds.AWSCredentials.AccessKey, AuthenticationCreds.AWSCredentials.SecretAccessKey, AuthenticationCreds.AWSCredentials.SessionToken);
-                StorageManager = new S3(AuthenticationCreds.AWSCredentials.AccessKey, AuthenticationCreds.AWSCredentials.SecretAccessKey, AuthenticationCreds.AWSCredentials.SessionToken);
-            }
-            catch (Exception ex)
-            {
-                Utility.Tools.logger.Error("[SESSION][ERROR] : Could not create db or s3 context for user, " + ex.Message);
-                return;
-            }
-            
-            SessionId = m_sessionManager.CreateSessionID(HttpContext.Current);
+        public bool IsAuthed()
+        {
+            return (AuthenticationCreds.StatusCode == FolloMeErrorCodes.AWSAndAPIVerified);
         }
     }
 }

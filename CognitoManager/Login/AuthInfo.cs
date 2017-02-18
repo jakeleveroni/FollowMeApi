@@ -1,4 +1,6 @@
-﻿namespace LogInManager
+﻿using Utility;
+
+namespace LogInManager
 {
     namespace Login
     {
@@ -13,39 +15,22 @@
             private bool m_authed;
             private bool m_accountExists;
             private AWSAuthInfo m_awsCreds;
+            public FolloMeErrorCodes StatusCode { get; set; }
 
             public string UserName
             {
-                get
-                {
-                    return m_userName;
-                }
-                set
-                {
-                    m_userName = value;
-                }
+                get { return m_userName; }
+                set { m_userName = value; }
             }
             public string Password
             {
-                get
-                {
-                    return m_password;
-                }
-                set
-                {
-                    m_password = value;
-                }
+                get { return m_password; }
+                set { m_password = value; }
             }
             public string Id
             {
-                get
-                {
-                    return m_id;
-                }
-                set
-                {
-                    m_id = value;
-                }
+                get { return m_id; }
+                set { m_id = value; }
             }
             public bool Authenticated
             {
@@ -75,14 +60,8 @@
 
             public bool UserExists
             {
-                get
-                {
-                    return m_accountExists;
-                }
-                set
-                {
-                    m_accountExists = value;
-                }
+                get { return m_accountExists; }
+                set { m_accountExists = value; }
             }
 
             public AWSAuthInfo AWSCredentials
@@ -108,16 +87,22 @@
                 m_id = string.Empty;
                 m_authed = false;
                 m_accountExists = false;
-
+                StatusCode = FolloMeErrorCodes.Uninitialized;
             }
 
-            public AuthInfo(string user, string pass, string id)
+            public AuthInfo(FolloMeErrorCodes code)
+            {
+                StatusCode = code;
+            }
+
+            public AuthInfo(string user, string pass, string id, FolloMeErrorCodes code = FolloMeErrorCodes.Uninitialized)
             {
                 m_userName = user;
                 m_password = pass;
                 m_id = id;
                 m_authed = false;
                 m_accountExists = false;
+                StatusCode = code;
             }
         } 
     }
