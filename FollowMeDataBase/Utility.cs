@@ -12,12 +12,14 @@ namespace Utility
         UpdateTrips,
         UpdateMilesTraveled,
         UpdatePassword,
+        UpdateFriends,
         InvalidUpdate,
     }
 
     public enum TripItemEnums
     {
         UpdateTripName = 0,
+        UpdateParticipants,
         UpdateTripMileage,
         InvalidUpdate,
     }
@@ -47,6 +49,8 @@ namespace Utility
                     return UserItemEnums.UpdateMilesTraveled;
                 case "TripIds":
                     return UserItemEnums.UpdateTrips;
+                case "Friends":
+                    return UserItemEnums.UpdateFriends;
                 default:
                     return UserItemEnums.InvalidUpdate;
             }
@@ -60,6 +64,8 @@ namespace Utility
                     return TripItemEnums.UpdateTripName;
                 case "TripMile":
                     return TripItemEnums.UpdateTripMileage;
+                case "Participants":
+                    return TripItemEnums.UpdateParticipants; 
                 default:
                     return TripItemEnums.InvalidUpdate;
             }
