@@ -26,10 +26,12 @@ namespace LogInManager
             public string UserName { get; }
             public string Password { get; }
 
-            public CustomLogInManager(string userName, string password)
+            public CustomLogInManager(string userName, string password, DB db)
             {
                 UserName = userName;
                 Password = password;
+                m_tmpDB = db;
+                m_stsConfig = new AmazonSecurityTokenServiceConfig();
             }
 
             // returns the auth info for the user, the auth info will have 
@@ -42,10 +44,8 @@ namespace LogInManager
 
                 try
                 {
-                    using (m_tmpDB = new DB())
-                    {
-                        users = m_tmpDB.QueryUsersByUserNameAndPassword(UserName, Password);
-                    }
+                    users = m_tmpDB.QueryUsersByUserNameAndPassword(UserName, Password);
+                    m_tmpDB = null;
                 }
                 catch (Exception ex)
                 {
@@ -118,8 +118,15 @@ namespace LogInManager
 
             public void Dispose()
             {
-                m_cognitoClient.Dispose();
-                m_tmpDB.Dispose();
+                if (m_cognitoClient != null)
+                {
+                    m_cognitoClient.Dispose();
+                }
+
+                if (m_tmpDB != null)
+                {
+                    m_tmpDB.Dispose();
+                }
             }
         }
     }

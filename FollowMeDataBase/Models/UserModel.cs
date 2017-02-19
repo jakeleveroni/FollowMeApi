@@ -92,7 +92,6 @@ namespace FollowMeDataBase.Models
             Email = email;
             Password = pass;
             BirthDate = bd.ToString();
-            NumberOfTrips = (uint)TripIds.Count;
             TotalMilesTraveled = miles;
 
             if (friends != null)
@@ -112,6 +111,8 @@ namespace FollowMeDataBase.Models
             {
                 TripIds = new List<string>();
             }
+
+            NumberOfTrips = (uint)TripIds.Count;
         }
 
         public UserModel(UserModel other)
