@@ -99,7 +99,11 @@ namespace LogInManager
                     try
                     {
                         // auth user through FolloMe federation idfentities
-                        GetSessionTokenRequest sessionTokenReq = new GetSessionTokenRequest();
+                        GetSessionTokenRequest sessionTokenReq = new GetSessionTokenRequest()
+                        {
+                            DurationSeconds = 3600,
+                        };
+
                         Credentials creds = stsClient.GetSessionToken(sessionTokenReq).Credentials;
                         SessionAWSCredentials sessionCreds = new SessionAWSCredentials(creds.AccessKeyId, creds.SecretAccessKey, creds.SessionToken);
 

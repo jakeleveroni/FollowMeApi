@@ -21,6 +21,7 @@ namespace FollowMeAPI.Sessions
         public AuthInfo AuthenticationCreds { get; set; }
 
         // users custom gateway to the db
+        public DB DBWrapper;
         private DB m_tmpDb;
 
         // users custom gateway to the s3 
@@ -51,6 +52,8 @@ namespace FollowMeAPI.Sessions
             {
                 AuthenticationCreds = loginManager.AuthenticateUserInApp();
                 m_tmpDb = null;
+
+                 
 
                 if (AuthenticationCreds.StatusCode == FolloMeErrorCodes.AWSAndAPIVerified)
                 {

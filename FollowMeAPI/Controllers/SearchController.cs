@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
 using Utility;
+using FollowMeAPI.Sessions;
 
 namespace FollowMeAPI.Controllers
 {
@@ -14,58 +16,76 @@ namespace FollowMeAPI.Controllers
 		[Route("users/{searchString}")]
 		public List<string> SearchUsers(string searchString)
 		{
-			List<string> queryResults = new List<string>();
+            string token = null;
+            List<string> queryResults = new List<string>();
 
-			try
-			{
-				List<UserModel> results = WebApiApplication.db.QueryUsersByName(searchString);
-				foreach (UserModel model in results)
-				{
-					queryResults.Add(JsonConvert.SerializeObject(model));
-				}
-			}
-			catch (Exception ex)
-			{
-                Tools.logger.Error("[SEARCH-USERS (BY-NAME)][ERROR] : Error while searching users by name, " + ex.Message);
-				return new List<string>();
-			}
+            if (Request.Headers.Contains("Token"))
+            {
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
+            }
 
-			try
-			{
-				List<UserModel> results = WebApiApplication.db.QueryUsersByUserName(searchString);
-				foreach (UserModel model in results)
-				{
-					queryResults.Add(JsonConvert.SerializeObject(model));
-				}
-			}
-			catch (Exception ex)
-			{
-                Tools.logger.Error("[SEARCH-USERS (BY-USERNAME)][ERROR] : Error while searching users by UserName, " + ex.Message);
-				return new List<string>();
-			}
+            if (SessionManager.ValidateSession(token))
+            {
+                try
+                {
+                    List<UserModel> results = WebApiApplication.db.QueryUsersByName(searchString);
+                    foreach (UserModel model in results)
+                    {
+                        queryResults.Add(JsonConvert.SerializeObject(model));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[SEARCH-USERS (BY-NAME)][ERROR] : Error while searching users by name, " + ex.Message);
+                    return new List<string>();
+                }
 
-			return queryResults;
-		}
+                try
+                {
+                    List<UserModel> results = WebApiApplication.db.QueryUsersByUserName(searchString);
+                    foreach (UserModel model in results)
+                    {
+                        queryResults.Add(JsonConvert.SerializeObject(model));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[SEARCH-USERS (BY-USERNAME)][ERROR] : Error while searching users by UserName, " + ex.Message);
+                    return new List<string>();
+                }
+            }
 
-		[HttpGet]
+            return queryResults;
+        }
+
+        [HttpGet] 
 		[Route("trips/{searchString}")]
 		public List<string> SearchTrips(string searchString)
 		{
-			List<string> nameQueryResult = new List<string>();
+            string token = null;
+            List<string> nameQueryResult = new List<string>();
+            
+            if (Request.Headers.Contains("Token"))
+            {
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
+            }
 
-			try
-			{
-				List<TripModel> results = WebApiApplication.db.QueryTripsByName(searchString);
-				foreach (TripModel model in results)
-				{
-					nameQueryResult.Add(JsonConvert.SerializeObject(model));
-				}
-			}
-			catch (Exception ex)
-			{
-                Tools.logger.Error("[SEARCH-TRIPS][ERROR] : Error while searching trips by name, " + ex.Message);
-				return new List<string>();
-			}
+            if (SessionManager.ValidateSession(token))
+            {
+                try
+                {
+                    List<TripModel> results = WebApiApplication.db.QueryTripsByName(searchString);
+                    foreach (TripModel model in results)
+                    {
+                        nameQueryResult.Add(JsonConvert.SerializeObject(model));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[SEARCH-TRIPS][ERROR] : Error while searching trips by name, " + ex.Message);
+                    return new List<string>();
+                }
+            }
 
 			return nameQueryResult;
 		}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
+using FollowMeAPI.Sessions;
 using Utility;
 
 namespace FollowMeAPI.Controllers
@@ -16,23 +17,32 @@ namespace FollowMeAPI.Controllers
         public string GetTripModel()
         {
             string tripId = null;
+            string token = null;
 
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (tripId != null)
+            if (Request.Headers.Contains("Token"))
             {
-                try
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
+            }
+
+            if (SessionManager.ValidateSession(token))
+            {
+                if (tripId != null)
                 {
-                    var str = WebApiApplication.db.GetTrip(tripId);
-                    Tools.logger.Debug("Serialized Object : " + str);
-                    return str;
-                }
-                catch (Exception ex)
-                {
-                    Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
+                    try
+                    {
+                        var str = WebApiApplication.db.GetTrip(tripId);
+                        Tools.logger.Debug("Serialized Object : " + str);
+                        return str;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
+                    }
                 }
             }
 
@@ -43,16 +53,27 @@ namespace FollowMeAPI.Controllers
         [Route("new")]
         public string PostTripModel([FromBody] TripModel tripJson)
         {
-            try
+            string token = null;
+
+            if (Request.Headers.Contains("Token"))
             {
-                WebApiApplication.db.AddNewTrip(tripJson);
-                return "Successfully added trip to db";
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
             }
-            catch (Exception ex)
+
+            if (SessionManager.ValidateSession(token))
             {
-                Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
-                return ex.Message;
+                try
+                {
+                    WebApiApplication.db.AddNewTrip(tripJson);
+                    return "Successfully added trip to db";
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
+                }
             }
+
+            return null;
         }
 
         [HttpDelete]
@@ -60,22 +81,31 @@ namespace FollowMeAPI.Controllers
         public bool DeleteTripModel()
         {
             string tripId= string.Empty;
+            string token = null;
 
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (tripId != null)
+            if (Request.Headers.Contains("Token"))
             {
-                try
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
+            }
+
+            if (SessionManager.ValidateSession(token))
+            {
+                if (tripId != null)
                 {
-                    WebApiApplication.db.RemoveTrip(tripId);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
+                    try
+                    {
+                        WebApiApplication.db.RemoveTrip(tripId);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
+                    }
                 }
             }
 
@@ -86,49 +116,59 @@ namespace FollowMeAPI.Controllers
         [Route("update")]
         public bool PatchTripModel()
         {
-            string tripId = null;
-            Dictionary<string, string> kvp = new Dictionary<string, string>();
+            string token = null;
 
-            if (Request.Headers.Contains("guid"))
+            if (Request.Headers.Contains("Token"))
             {
-                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+                token = Request.Headers.GetValues("Token").FirstOrDefault();
             }
 
-            if (tripId == null)
+            if (SessionManager.ValidateSession(token))
             {
-                return false;
-            }
+                string tripId = null;
+                Dictionary<string, string> kvp = new Dictionary<string, string>();
 
-            if (Request.Headers.Contains("TripName"))
-            {
-                kvp.Add("TripName", Request.Headers.GetValues("TripName").FirstOrDefault());
-            }
-            if (Request.Headers.Contains("Mileage"))
-            {
-                kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
-            }
-
-            if (kvp.Count > 0)
-            {
-                try
+                if (Request.Headers.Contains("guid"))
                 {
-                    foreach (KeyValuePair<string, string> entry in kvp)
-                    {
-                        TripItemEnums updateType = Tools.GetTripItemEnum(entry.Key);
-
-                        if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
-                        {
-                            WebApiApplication.db.UpdateTrip(tripId, entry.Value, updateType);
-                            return true;
-                        }
-                    }
-
-                    return true;
+                    tripId = Request.Headers.GetValues("guid").FirstOrDefault();
                 }
-                catch (Exception ex)
+
+                if (tripId == null)
                 {
-                    Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
-                } 
+                    return false;
+                }
+
+                if (Request.Headers.Contains("TripName"))
+                {
+                    kvp.Add("TripName", Request.Headers.GetValues("TripName").FirstOrDefault());
+                }
+                if (Request.Headers.Contains("Mileage"))
+                {
+                    kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
+                }
+
+                if (kvp.Count > 0)
+                {
+                    try
+                    {
+                        foreach (KeyValuePair<string, string> entry in kvp)
+                        {
+                            TripItemEnums updateType = Tools.GetTripItemEnum(entry.Key);
+
+                            if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
+                            {
+                                WebApiApplication.db.UpdateTrip(tripId, entry.Value, updateType);
+                                return true;
+                            }
+                        }
+
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
+                    }
+                }
             }
 
             return false;
