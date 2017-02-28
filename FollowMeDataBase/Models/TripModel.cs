@@ -42,6 +42,7 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("Participants")]
         public List<Guid> Participants { get; set; }
 
+
         // METHODS
         public TripModel()
         {
@@ -100,6 +101,11 @@ namespace FollowMeDataBase.Models
 
         public static bool operator ==(TripModel a, TripModel b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+            {
+                return false;
+            }
+
             if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && 
                 a.TripName == b.TripName && a.TripDescription == b.TripDescription &&
                 a.Participants == b.Participants)
