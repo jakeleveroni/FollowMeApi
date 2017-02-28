@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Web.SessionState;
 using Utility;
@@ -10,6 +11,19 @@ namespace FollowMeAPI.Sessions
         public static SessionIDManager m_idManager;
         private static HashSet<string> m_activeSessionTokens = new HashSet<string>(StringComparer.InvariantCulture);
         private static Dictionary<string, FollowMeSession> m_sessions = new Dictionary<string, FollowMeSession>();
+
+        public static void FlushSessions()
+        {
+            m_sessions.Clear();
+            m_activeSessionTokens.Clear();
+        }
+
+        public static List<string> GetActiveTokens()
+        {
+            string[] tmpArr = null;
+            m_activeSessionTokens.CopyTo(tmpArr);
+            return tmpArr.ToList();
+        }
 
         public static bool AddNewSession(FollowMeSession sesh)
         {
