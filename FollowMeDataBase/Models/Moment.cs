@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace FollowMeDataBase.Models
 {
-    class Moment
+    public class Moment
     {
         [DataMember(Name = "Title")]
         [DynamoDBProperty("Title")]
@@ -59,6 +59,16 @@ namespace FollowMeDataBase.Models
             {
                 ImageContent = mediaContent;
             }
+        }
+
+        public Moment(Moment other)
+        {
+            Title = other.Title;
+            TextContent = other.TextContent;
+            ImageContent = other.ImageContent;
+            VideoContent = other.VideoContent;
+            Arn = other.Arn;
+            MetaData = new Dictionary<string, string>(other.MetaData);
         }
 
         public void GenerateARN()

@@ -42,11 +42,15 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("Participants")]
         public List<Guid> Participants { get; set; }
 
+        [DataMember(Name = "Participants")]
+        [DynamoDBProperty("Participants")]
+        public List<Moment> Moments { get; set; }
 
         // METHODS
         public TripModel()
         {
             Participants = new List<Guid>();
+            Moments = new List<Moment>();
         }
 
         public TripModel(Guid id, string name, ulong miles, string desc, List<Guid> participants = null)
@@ -55,6 +59,7 @@ namespace FollowMeDataBase.Models
             TripName = name;
             TripMileage = miles;
             TripDescription = desc;
+            Moments = new List<Moment>();
 
             if (participants != null)
             {
@@ -72,7 +77,8 @@ namespace FollowMeDataBase.Models
             TripName = other.TripName;
             TripMileage = other.TripMileage;
             TripDescription = other.TripDescription;
-            Participants = other.Participants;
+            Participants = new List<Guid>(other.Participants);
+            Moments = new List<Moment>(other.Moments);
         }
 
         public string SerializeToJson()
@@ -88,16 +94,33 @@ namespace FollowMeDataBase.Models
 			string name = obj["TripName"].S;
 			ulong miles;
 			ulong.TryParse(mileage, out miles);
+            List<Moment> moments = null;
+            List <Guid> participants = null;
 
-            List<Guid> participants = new List<Guid>();
-
-            for (int i = 0; i < obj["Participants"].L.Count; ++i)
+            if (obj["Participants"].L.Count > 0)
             {
-                participants.Add(new Guid(obj["Participants"].L[i].S));
+                participants = new List<Guid>();
+                for (int i = 0; i < obj["Participants"].L.Count; ++i)
+                {
+                    participants.Add(new Guid(obj["Participants"].L[i].S));
+                } 
             }
 
-            return new TripModel(new Guid(id), name, miles, desc);
-		}
+            if (obj["Moments"].L.Count > 0)
+            {
+                moments = new List<Moment>();
+                for (int i = 0; i < obj["Moments"].L.Count; ++i)
+                {
+                    moments.Add(new Moment(JsonConvert.DeserializeObject<Moment>(obj["Moments"].L[i].S)));
+                } 
+            }
+
+            TripModel trip = new TripModel(new Guid(id), name, miles, desc);
+            trip.Participants = participants;
+            trip.Moments = moments;
+
+            return trip;
+        }
 
         public static bool operator ==(TripModel a, TripModel b)
         {
@@ -108,7 +131,7 @@ namespace FollowMeDataBase.Models
 
             if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && 
                 a.TripName == b.TripName && a.TripDescription == b.TripDescription &&
-                a.Participants == b.Participants)
+                a.Participants == b.Participants && a.Moments == b.Moments)
             {
                 return true;
             }
@@ -138,11 +161,34 @@ namespace FollowMeDataBase.Models
             return false;
         }
 
+        public bool AddMoment(Moment newMoment)
+        {
+            if (!Moments.Contains(newMoment))
+            {
+                Moments.Add(newMoment);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool RemoveMoment(Moment newMoment)
+        {
+            if (Moments.Contains(newMoment))
+            {
+                Moments.Remove(newMoment);
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool operator !=(TripModel a, TripModel b)
         {
             return !(a == b);
         }
 
+        [Obsolete("No longer returns completely stringified trip model")]
         public override string ToString()
         {
             return string.Format("Trip Name : {0}\nTrip Miles : {1}\nTrip Id : {2}\nDescription : {3}", TripName, TripMileage, TripId, TripDescription);
