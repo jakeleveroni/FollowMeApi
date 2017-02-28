@@ -6,15 +6,17 @@ using LogInManager.Login;
 using FollowMeDataBase.Models;
 using FollowMeDataBase.DBCallWrappers;
 using StorageManager.S3Wrapper;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace FollowMeAPI.Sessions
 {
     public class FollowMeSession
     {
         // SessionIdManager used for generating session ids
-        private SessionIDManager m_sessionManager;
+		private SessionIDManager m_sessionManager;
 
-        // the session ID, used to be able to access a users session
+		// the session ID, used to be able to access a users session
         public string SessionId;
 
         // All authentication credentials both for the API as well as temporary AWS credentials
@@ -31,10 +33,7 @@ namespace FollowMeAPI.Sessions
         public UserModel User;
 
         private string m_userName;
-        private string m_password;
-
-        // user aws token 
-
+		private string m_password;
 
         // constructor, creates a complete user session 
         public FollowMeSession(string userName, string password, DB db)

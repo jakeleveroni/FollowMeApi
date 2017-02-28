@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Web.Http;
+using System.Net.Http;
 using FollowMeAPI.Sessions;
 using Utility;
 
@@ -10,10 +11,11 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("auth")]
-        public FolloMeResponse LogInUser()
+        public HttpResponseMessage LogInUser()
         {
             string userName = null;
             string password = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("UserName") && Request.Headers.Contains("Password"))
             {
@@ -31,22 +33,23 @@ namespace FollowMeAPI.Controllers
 
                     if (SessionManager.AddNewSession(session))
                     {
-                        return new FolloMeResponse(200, FolloMeErrorCodes.LogInSucceded, "Successfully logged in to the API and gained temporary AWS Credentials");
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+						return response;
                     }
                     else
                     {
-                        SessionManager.RemoveSession(session);
-                        return new FolloMeResponse(404, session.AuthenticationCreds.StatusCode, "Authentication failed, see follow me error code for more information");
-                    }
+						throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
+					}
                 }
                 else
                 {
-                    return new FolloMeResponse(404, session.AuthenticationCreds.StatusCode, "Authentication failed, see follow me error code for more information");
-                }
+					throw new HttpResponseException(System.Net.HttpStatusCode.NonAuthoritativeInformation);
+
+				}
             }
             else
             {
-                return new FolloMeResponse(404, FolloMeErrorCodes.NoCredentialsProvided, "Either the username or password provided were null");
+				throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
             }
         }
     }

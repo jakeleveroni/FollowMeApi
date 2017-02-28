@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Http;
+using System.Net.Http;
 using System.Linq;
 using System.Collections.Generic;
 using FollowMeDataBase.Models;
@@ -14,10 +15,11 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("get")]
-        public string GetTripModel()
+        public HttpResponseMessage GetTripModel()
         {
             string tripId = null;
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("guid"))
             {
@@ -37,23 +39,27 @@ namespace FollowMeAPI.Controllers
                     {
                         var str = WebApiApplication.db.GetTrip(tripId);
                         Tools.logger.Debug("Serialized Object : " + str);
-                        return str;
+						response.Headers.Add("TripModel", str);
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+						return response;
                     }
                     catch (Exception ex)
                     {
                         Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
+						throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
                     }
                 }
             }
 
-            return null;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
 
         [HttpPost]
         [Route("new")]
-        public string PostTripModel([FromBody] TripModel tripJson)
+        public HttpResponseMessage PostTripModel([FromBody] TripModel tripJson)
         {
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("Token"))
             {
@@ -65,7 +71,8 @@ namespace FollowMeAPI.Controllers
                 try
                 {
                     WebApiApplication.db.AddNewTrip(tripJson);
-                    return "Successfully added trip to db";
+					response.StatusCode = System.Net.HttpStatusCode.OK;
+					return response;
                 }
                 catch (Exception ex)
                 {
@@ -73,16 +80,17 @@ namespace FollowMeAPI.Controllers
                 }
             }
 
-            return null;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
 
         [HttpDelete]
         [Route("delete")]
-        public bool DeleteTripModel()
+		public HttpResponseMessage DeleteTripModel()
         {
             string tripId= string.Empty;
             string token = null;
-
+			HttpResponseMessage response = new HttpResponseMessage();
+			
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
@@ -100,7 +108,8 @@ namespace FollowMeAPI.Controllers
                     try
                     {
                         WebApiApplication.db.RemoveTrip(tripId);
-                        return true;
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+                        
                     }
                     catch (Exception ex)
                     {
@@ -109,14 +118,15 @@ namespace FollowMeAPI.Controllers
                 }
             }
 
-            return false;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
 
         [HttpPatch]
         [Route("update")]
-        public bool PatchTripModel()
+        public HttpResponseMessage PatchTripModel()
         {
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("Token"))
             {
@@ -135,7 +145,7 @@ namespace FollowMeAPI.Controllers
 
                 if (tripId == null)
                 {
-                    return false;
+					throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
                 }
 
                 if (Request.Headers.Contains("TripName"))
@@ -158,11 +168,11 @@ namespace FollowMeAPI.Controllers
                             if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
                             {
                                 WebApiApplication.db.UpdateTrip(tripId, entry.Value, updateType);
-                                return true;
                             }
                         }
 
-                        return true;
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+						return response;
                     }
                     catch (Exception ex)
                     {
@@ -171,7 +181,7 @@ namespace FollowMeAPI.Controllers
                 }
             }
 
-            return false;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
     }
 }

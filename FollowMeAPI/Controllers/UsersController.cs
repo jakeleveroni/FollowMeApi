@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Http;
+using System.Net.Http;
 using System.Linq;
 using FollowMeDataBase.Models;
 using FollowMeAPI.Sessions;
@@ -14,112 +15,126 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("get")]
-        public string GetUserModel()
+        public HttpResponseMessage GetUserModel()
         {
             string userId = null;
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
-            if (Request.Headers.Contains("Token"))
-            {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
-            }
+			if (Request.Headers.Contains("Token"))
+			{
+				token = Request.Headers.GetValues("Token").FirstOrDefault();
+			}
 
             if (SessionManager.ValidateSession(token))
             {
                 if (Request.Headers.Contains("guid"))
                 {
                     userId = Request.Headers.GetValues("guid").FirstOrDefault();
-                }
+				}
 
                 if (userId != null)
                 {
+					response.Headers.Add("guid", userId);
+					
                     try
                     {
                         var str = WebApiApplication.db.GetUser(userId);
                         Tools.logger.Debug("Serialized Object : " + str);
-                        return str;
+						response.Headers.Add("UserModel", str);
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+						return response;
                     }
                     catch (Exception ex)
                     {
                         Tools.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
-                    }
+						throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+					}
                 }
             }
 
-            return null;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
 
         [HttpPost]
         [Route("new")]
-        public string PostUserModel([FromBody] UserModel jsonUser)
+		public HttpResponseMessage PostUserModel([FromBody] UserModel jsonUser)
         {
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("Token"))
             {
                 token = Request.Headers.GetValues("Token").FirstOrDefault();
             }
 
-            if (SessionManager.ValidateSession(token))
-            {
-                try
-                {
-                    WebApiApplication.db.AddNewUser(jsonUser);
-                    return jsonUser.ToString();
-                }
-                catch (Exception ex)
-                {
-                    Tools.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
-                    return (ex.Message + "\t" + jsonUser);
-                }
-            }
+			if (SessionManager.ValidateSession(token))
+			{
+				try
+				{
+					WebApiApplication.db.AddNewUser(jsonUser);
+					response.Headers.Add("UserModel", jsonUser.ToString());
+					response.StatusCode = System.Net.HttpStatusCode.OK;
+					return response;
 
-            return null;
-        }
+				}
+				catch (Exception ex)
+				{
+					Tools.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
+					throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
+				}
+			}
+
+			throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
+		}
 
         [HttpDelete]
         [Route("delete")]
-        public bool DeleteUserModel()
+        public HttpResponseMessage DeleteUserModel()
         {
             string userId = string.Empty;
             string token = null;
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("Token"))
             {
                 token = Request.Headers.GetValues("Token").FirstOrDefault();
             }
 
-            if (SessionManager.ValidateSession(token))
-            {
-                if (Request.Headers.Contains("guid"))
-                {
-                    userId = Request.Headers.GetValues("guid").FirstOrDefault();
-                }
+			if (SessionManager.ValidateSession(token))
+			{
+				if (Request.Headers.Contains("guid"))
+				{
+					userId = Request.Headers.GetValues("guid").FirstOrDefault();
+				}
 
-                if (userId != null)
-                {
-                    try
-                    {
-                        WebApiApplication.db.RemoveUser(userId);
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
-                    }
-                }
-            }
+				if (userId != null)
+				{
+					try
+					{
+						WebApiApplication.db.RemoveUser(userId);
+						response.StatusCode = System.Net.HttpStatusCode.OK;
+						return response;
+					}
+					catch (Exception ex)
+					{
+						Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+						throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
+					}
+				}
+			}
 
-            return false;
+			throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
         }
 
         [HttpPatch]
         [Route("update")]
-        public bool PatchUserModel()
+        public HttpResponseMessage PatchUserModel()
         {
             string userId = null;
             string token = null;
             Dictionary<string, string> kvp = new Dictionary<string, string>();
+			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("Token"))
             {
@@ -135,7 +150,7 @@ namespace FollowMeAPI.Controllers
 
                 if (userId == null)
                 {
-                    return false;
+					throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
                 }
 
                 // the header is parsed out this way because the header collection is implemented in 
@@ -186,19 +201,19 @@ namespace FollowMeAPI.Controllers
                             if (updateType != UserItemEnums.InvalidUpdate && entry.Value != null)
                             {
                                 WebApiApplication.db.UpdateUser(userId, entry.Value, updateType);
-                                return true;
+								response.StatusCode = System.Net.HttpStatusCode.OK;
+                                return response;
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
-                        return false;
                     }
                 }
             }
 
-            return false;
+			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
         }
     }
 }
