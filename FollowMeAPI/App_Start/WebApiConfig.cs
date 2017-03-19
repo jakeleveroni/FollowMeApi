@@ -6,6 +6,8 @@ namespace FollowMeAPI
 {
     public static class WebApiConfig
     {
+		public static string Version = "1.0.0.1";
+
         public static void Register(HttpConfiguration config)
         {
             // enable log4net logging for debugging

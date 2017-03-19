@@ -127,7 +127,7 @@ namespace FollowMeAPI.Controllers
 			throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
         }
 
-        [HttpPatch]
+		[HttpPatch]
         [Route("update")]
         public HttpResponseMessage PatchUserModel()
         {
@@ -213,7 +213,7 @@ namespace FollowMeAPI.Controllers
                 }
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+			throw new HttpResponseException(System.Net.HttpStatusCode.NonAuthoritativeInformation);
         }
     }
 }

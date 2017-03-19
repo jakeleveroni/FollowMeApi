@@ -20,5 +20,12 @@ namespace FollowMeAPI.Controllers
         {
             return SessionManager.GetActiveTokens();
         }
+
+		[HttpGet]
+		[Route("version")]
+		public string GetVerstion()
+		{
+			return WebApiConfig.Version;
+		}
     }
 }
