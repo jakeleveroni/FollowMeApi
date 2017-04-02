@@ -16,8 +16,8 @@ namespace FollowMeDataBase.Models
 			VideoContent = null;
 		}
 
-		public VideoMoment(byte[] content, string name, Guid id, string creator, string longitude, string latitude)
-			: base(name, id, creator, longitude, latitude)
+		public VideoMoment(byte[] content, string name, Guid momentId, Guid contentId, string creator, string longitude, string latitude)
+			: base(name, momentId, contentId, creator, longitude, latitude)
 		{
 			VideoContent = content;
 			Type = "video";

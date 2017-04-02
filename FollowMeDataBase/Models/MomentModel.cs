@@ -26,6 +26,10 @@ namespace FollowMeDataBase.Models
 		[DynamoDBProperty("Creator")]
 		public string Creator { get; set; }
 
+		[DataMember(Name = "ContentId")]
+		[DynamoDBProperty("ContentId")]
+		public Guid ContentId { get; set; }
+
 		[DataMember(Name = "Type")]
 		[DynamoDBProperty("Type")]
 		public string Type { get; set; }
@@ -34,16 +38,18 @@ namespace FollowMeDataBase.Models
 		{
 			Title = "Uninitalized";
 			Creator = "None";
+			ContentId = new Guid();
 			Longitude = Latitude = "None";
 			Type = "Base";
 		}
 
-		public MomentModel(string title, Guid id, string owner, string longitude, string latitude)
+		public MomentModel(string title, Guid momentId, Guid contentId, string owner, string longitude, string latitude)
 		{
 			Title = title;
 			Longitude = longitude;
 			Latitude = latitude;
-			MomentId = id;
+			MomentId = momentId;
+			ContentId = contentId;
 			Creator = owner;
 			Type = "Base";
 		}
@@ -55,6 +61,7 @@ namespace FollowMeDataBase.Models
 			Latitude = other.Latitude;
 			Creator = other.Creator;
 			MomentId = other.MomentId;
+			ContentId = other.ContentId;
 			Type = "Base";
 		}
 

@@ -16,8 +16,8 @@ namespace FollowMeDataBase.Models
 			ImageContent = null;
 		}
 
-		public ImageMoment(byte[] content, string name, Guid id, string creator, string longitude, string latitude)
-			: base(name, id, creator, longitude, latitude)
+		public ImageMoment(byte[] content, string name, Guid momentId, Guid contentId, string creator, string longitude, string latitude)
+			: base(name, momentId, contentId, creator, longitude, latitude)
 		{
 			ImageContent = content;
 			Type = "image";
