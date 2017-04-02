@@ -12,7 +12,7 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("url-user-content/get")]
-        public string GetProfileImageURL()
+        public string GetProfileImageUrl()
         {
             string url = null;
             string token = null, userId = null;
@@ -29,9 +29,9 @@ namespace FollowMeAPI.Controllers
                     userId = Request.Headers.GetValues("UserId").FirstOrDefault();
                 }
 
-                if (userId != null || userId != string.Empty)
+                if (string.IsNullOrEmpty(userId))
                 {
-                    url = WebApiApplication.s3.GetUserProfileImageURL(userId);
+                    url = WebApiApplication.s3.GetUserProfileImageUrl(userId);
                 }
             }
 
@@ -51,14 +51,18 @@ namespace FollowMeAPI.Controllers
                 token = Request.Headers.GetValues("Token").FirstOrDefault();
             }
 
-            if (SessionManager.ValidateSession(token))
+            if (!SessionManager.ValidateSession(token))
+            {
+
+            }
+            else
             {
                 if (Request.Headers.Contains("UserId"))
                 {
                     userId = Request.Headers.GetValues("UserId").FirstOrDefault();
                 }
 
-                if (userId != null || userId != string.Empty)
+                if (string.IsNullOrEmpty(userId))
                 {
                     response = WebApiApplication.s3.GetUserProfileImageBase64(userId);
                 }
@@ -69,11 +73,16 @@ namespace FollowMeAPI.Controllers
 
         [HttpPost]
         [Route("frombody-user-content/upload")]
-        public HttpResponseMessage FromBodyPostProfileImage([FromBody] string base64string)
+        public HttpResponseMessage FromBodyPostProfileImage([FromBody] string content)
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string token = null, userId = null;
 
+            if (string.IsNullOrEmpty(content))
+            {
+                response.StatusCode = HttpStatusCode.NoContent;
+                return response;
+            }
 
             if (Request.Headers.Contains("Token"))
             {
@@ -87,14 +96,22 @@ namespace FollowMeAPI.Controllers
                     userId = Request.Headers.GetValues("UserId").FirstOrDefault();
                 }
 
-                if (userId != null)
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    WebApiApplication.s3.UploadProfileImageFromBase64String(userId, base64string);
+                    WebApiApplication.s3.UploadProfileImageFromBase64String(userId, content);
+                }
+                else
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    return response;
                 }
             }
+
+            response.StatusCode = HttpStatusCode.OK;
             return response;
         }
 
+        // NOTE: random error codes for debugging purposes
         [HttpPost]
         [Route("user-content/upload")]
         public async Task<HttpResponseMessage> MultiPartPostProfileImage()
@@ -113,7 +130,7 @@ namespace FollowMeAPI.Controllers
                     userId = Request.Headers.GetValues("UserId").FirstOrDefault();
                 }
 
-                if (userId != null || userId != string.Empty)
+                if (!string.IsNullOrEmpty(userId))
                 {
                     // verify request is multipart form data type
                     if (!Request.Content.IsMimeMultipartContent())
@@ -127,8 +144,7 @@ namespace FollowMeAPI.Controllers
 
                         foreach (var stream in incomingFiles.Contents)
                         {
-                            byte[] fileAsBytes;
-                            fileAsBytes = await stream.ReadAsByteArrayAsync();
+                            byte[] fileAsBytes = await stream.ReadAsByteArrayAsync();
                             string base64Image = Convert.ToBase64String(fileAsBytes);
                             WebApiApplication.s3.UploadProfileImageFromBase64String(userId, base64Image);
                         }
@@ -137,7 +153,7 @@ namespace FollowMeAPI.Controllers
                     }
                     catch (Exception e)
                     {
-                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+                        return Request.CreateErrorResponse(HttpStatusCode.NoContent, e.Message);
                     }
                 }
             }

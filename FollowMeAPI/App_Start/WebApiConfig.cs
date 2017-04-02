@@ -6,7 +6,9 @@ namespace FollowMeAPI
 {
     public static class WebApiConfig
     {
-		public static string Version = "1.0.0.1";
+		public const string Version = "1.0.0.1";
+
+        public const string LastCommit = "Updated the content upload download implementation to test multiple methods (multipart/base 64 string)";
 
         public static void Register(HttpConfiguration config)
         {
@@ -17,11 +19,11 @@ namespace FollowMeAPI
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "api/{controller}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
         }
     }
 }

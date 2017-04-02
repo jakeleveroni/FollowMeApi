@@ -6,23 +6,21 @@ using System.IO;
 using Amazon.S3.Model;
 using Utility;
 using System.Drawing;
-using System.Text;
 
 namespace StorageManager.S3Wrapper
 {
-
     public class S3 : IDisposable
     {
-		private TransferUtility m_TransUtil;
-		private IAmazonS3 m_Client;
-		private string m_S3Bucket = "followme.usercontent";
+		private readonly TransferUtility _mTransUtil;
+		private readonly IAmazonS3 _mClient;
+		private const string Ms3Bucket = "followme.usercontent";
 
         public S3()
         {
             try
             {
-                m_Client = new AmazonS3Client(Amazon.RegionEndpoint.USWest2);
-                m_TransUtil = new TransferUtility(m_Client);
+                _mClient = new AmazonS3Client(Amazon.RegionEndpoint.USWest2);
+                _mTransUtil = new TransferUtility(_mClient);
             }
             catch (Exception ex)
             {
@@ -34,8 +32,8 @@ namespace StorageManager.S3Wrapper
         {
             try
             {
-                m_Client = new AmazonS3Client(accessKey, secretAccessKey, token, Amazon.RegionEndpoint.USWest2);
-                m_TransUtil = new TransferUtility(m_Client);
+                _mClient = new AmazonS3Client(accessKey, secretAccessKey, token, Amazon.RegionEndpoint.USWest2);
+                _mTransUtil = new TransferUtility(_mClient);
             }
             catch(Exception ex)
             {
@@ -59,7 +57,7 @@ namespace StorageManager.S3Wrapper
 
             TransferUtilityUploadRequest uploadReq = new TransferUtilityUploadRequest
             {
-                BucketName = m_S3Bucket,
+                BucketName = Ms3Bucket,
                 InputStream = memStream,
                 StorageClass = S3StorageClass.ReducedRedundancy,
                 Key = "Users/" + userId + "/Profile/ProfileImage",
@@ -67,7 +65,7 @@ namespace StorageManager.S3Wrapper
 
             try
             {
-                m_TransUtil.Upload(uploadReq);
+                _mTransUtil.Upload(uploadReq);
             }
             catch (Exception ex)
             {
@@ -93,7 +91,7 @@ namespace StorageManager.S3Wrapper
 
             TransferUtilityUploadRequest uploadReq = new TransferUtilityUploadRequest
             {
-                BucketName = m_S3Bucket,
+                BucketName = Ms3Bucket,
                 InputStream = new MemoryStream(imageInBytes),
                 StorageClass = S3StorageClass.ReducedRedundancy,
                 Key = "Users/" + userId + "/Profile/ProfileImage",
@@ -101,7 +99,7 @@ namespace StorageManager.S3Wrapper
 
             try
             {
-                m_TransUtil.Upload(uploadReq);
+                _mTransUtil.Upload(uploadReq);
                 return true;
             }
             catch (Exception ex)
@@ -113,19 +111,19 @@ namespace StorageManager.S3Wrapper
 
         // returns a string URL that points to the requested profile picture
         // this means that the asset must be made public when its uploaded
-		public string GetUserProfileImageURL(string userId)
+		public string GetUserProfileImageUrl(string userId)
 		{
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
-                BucketName = m_S3Bucket,
-                Key = string.Format("Users/{0}/Profile/ProfileImage", userId),
+                BucketName = Ms3Bucket,
+                Key = $"Users/{userId}/Profile/ProfileImage",
                 Expires = DateTime.Now.AddHours(1),
                 Protocol = Protocol.HTTP,
             };
 
 			try
 			{
-                return m_Client.GetPreSignedURL(req);
+                return _mClient.GetPreSignedURL(req);
 			}
 			catch (AmazonS3Exception amazonS3Exception)
 			{
@@ -146,21 +144,19 @@ namespace StorageManager.S3Wrapper
         // profile image
         public string GetUserProfileImageBase64(string userId)
         {
-            string responseBody = "";
-
             GetObjectRequest request = new GetObjectRequest
             {
-                BucketName = m_S3Bucket,
+                BucketName = Ms3Bucket,
                 Key = "Users/" + userId + "/Profile" + "/ProfileImage"
             };
 
             try
             {
-                using (GetObjectResponse s3Res = m_Client.GetObject(request))
+                using (GetObjectResponse s3Res = _mClient.GetObject(request))
                 using (Stream responseStream = s3Res.ResponseStream)
                 using (StreamReader reader = new StreamReader(responseStream))
                 {
-                    responseBody = reader.ReadToEnd();
+                    string responseBody = reader.ReadToEnd();
                     return responseBody;
                 }
             }
@@ -194,14 +190,14 @@ namespace StorageManager.S3Wrapper
             TransferUtilityUploadRequest req = new TransferUtilityUploadRequest
             {
                 InputStream = memStream,
-                Key = string.Format("Trips/{}/{}/{}", tripId, userId, contentGuid),
+                Key = $"Trips/{tripId}/{userId}/{contentGuid}",
                 AutoCloseStream = true,
                 StorageClass = S3StorageClass.ReducedRedundancy
             };
 
             try
             {
-                m_TransUtil.Upload(req);
+                _mTransUtil.Upload(req);
             }
             catch (Exception ex)
             {
@@ -214,19 +210,17 @@ namespace StorageManager.S3Wrapper
 
         public string DownloadSingleItemFromTrip(string userId, string tripId, string contentGuid)
         {
-            string responseBody = string.Empty;
-
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest
             {
-                BucketName = m_S3Bucket,
-                Key = string.Format("Trips/{0}/{1}/{2}", tripId, userId, contentGuid),
+                BucketName = Ms3Bucket,
+                Key = $"Trips/{tripId}/{userId}/{contentGuid}",
                 Expires = DateTime.Now.AddHours(1),
                 Protocol = Protocol.HTTP,
             };
 
             try
             {
-                return m_Client.GetPreSignedURL(req);
+                return _mClient.GetPreSignedURL(req);
             }
             catch (Exception ex)
             {
@@ -240,24 +234,24 @@ namespace StorageManager.S3Wrapper
             List<string> urls = new List<string>();
             ListObjectsV2Request listReq = new ListObjectsV2Request
             {
-                BucketName = m_S3Bucket,
+                BucketName = Ms3Bucket,
                 MaxKeys = 50,
-                StartAfter = string.Format("Trips/{0}/{1}/", tripId, userId),
+                StartAfter = $"Trips/{tripId}/{userId}/",
             };
 
-            ListObjectsV2Response listRes = m_Client.ListObjectsV2(listReq);
+            ListObjectsV2Response listRes = _mClient.ListObjectsV2(listReq);
 
             foreach (var item in listRes.S3Objects)
             {
                 GetPreSignedUrlRequest urlReq = new GetPreSignedUrlRequest
                 {
-                    BucketName = m_S3Bucket,
+                    BucketName = Ms3Bucket,
                     Key = item.Key,
                     Expires = DateTime.Now.AddHours(1),
                     Protocol = Protocol.HTTP
                 };
 
-                urls.Add(m_Client.GetPreSignedURL(urlReq));
+                urls.Add(_mClient.GetPreSignedURL(urlReq));
             }
 
             return (urls.Count > 0) ? urls : null; 
@@ -265,8 +259,8 @@ namespace StorageManager.S3Wrapper
 
         public void Dispose()
 		{
-			m_Client.Dispose();
-			m_TransUtil.Dispose();
+			_mClient.Dispose();
+			_mTransUtil.Dispose();
 		}
 	}
 }
