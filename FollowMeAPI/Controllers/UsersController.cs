@@ -208,7 +208,7 @@ namespace FollowMeAPI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
+                        Tools.logger.Error("[UPDATE USER][ERROR] : Could not update user in db, " + ex.Message);
                     }
                 }
             }

@@ -8,12 +8,9 @@
 */
 
 using System;
-using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
 
@@ -63,6 +60,7 @@ namespace FollowMeDataBase.Models
         [DataMember(Name = "Friends")]
         [DynamoDBProperty("Friends")]
         public List<Guid> Friends { get; set; }
+
 
 
         // METHODS

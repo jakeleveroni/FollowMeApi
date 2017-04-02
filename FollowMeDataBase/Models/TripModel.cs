@@ -40,15 +40,15 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("Participants")]
         public List<Guid> Participants { get; set; }
 
-        [DataMember(Name = "Participants")]
-        [DynamoDBProperty("Participants")]
-        public List<Moment> Moments { get; set; }
+        [DataMember(Name = "Moments")]
+        [DynamoDBProperty("Moments")]
+        public List<Guid> Moments { get; set; }
 
         // METHODS
         public TripModel()
         {
             Participants = new List<Guid>();
-            Moments = new List<Moment>();
+			Moments = new List<Guid>();
         }
 
         public TripModel(Guid id, string name, ulong miles, string desc, List<Guid> participants = null)
@@ -57,7 +57,7 @@ namespace FollowMeDataBase.Models
             TripName = name;
             TripMileage = miles;
             TripDescription = desc;
-            Moments = new List<Moment>();
+			Moments = new List<Guid>();
 
             if (participants != null)
             {
@@ -76,7 +76,7 @@ namespace FollowMeDataBase.Models
             TripMileage = other.TripMileage;
             TripDescription = other.TripDescription;
             Participants = new List<Guid>(other.Participants);
-            Moments = new List<Moment>(other.Moments);
+            Moments = new List<Guid>(other.Moments);
         }
 
         public string SerializeToJson()
@@ -92,7 +92,7 @@ namespace FollowMeDataBase.Models
 			string name = obj["TripName"].S;
 			ulong miles;
 			ulong.TryParse(mileage, out miles);
-            List<Moment> moments = null;
+            List<Guid> moments = null;
             List <Guid> participants = null;
 
             if (obj["Participants"].L.Count > 0)
@@ -106,10 +106,10 @@ namespace FollowMeDataBase.Models
 
             if (obj["Moments"].L.Count > 0)
             {
-                moments = new List<Moment>();
+                moments = new List<Guid>();
                 for (int i = 0; i < obj["Moments"].L.Count; ++i)
                 {
-                    moments.Add(new Moment(JsonConvert.DeserializeObject<Moment>(obj["Moments"].L[i].S)));
+					moments.Add(new Guid(obj["Moments"].L[i].S));
                 } 
             }
 
@@ -159,7 +159,7 @@ namespace FollowMeDataBase.Models
             return false;
         }
 
-        public bool AddMoment(Moment newMoment)
+        public bool AddMoment(Guid newMoment)
         {
             if (!Moments.Contains(newMoment))
             {
@@ -170,7 +170,7 @@ namespace FollowMeDataBase.Models
             return false;
         }
 
-        public bool RemoveMoment(Moment newMoment)
+        public bool RemoveMoment(Guid newMoment)
         {
             if (Moments.Contains(newMoment))
             {

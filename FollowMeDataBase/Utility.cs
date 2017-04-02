@@ -21,8 +21,18 @@ namespace Utility
         UpdateTripName = 0,
         UpdateParticipants,
         UpdateTripMileage,
-        InvalidUpdate,
+        UpdateMoments,
+		InvalidUpdate,
     }
+
+	public enum MomentItemEnums
+	{
+		UpdateTitle = 0,
+		UpdateLongitude,
+		UpdateLatitude,
+		UpdateCreator,
+		InvalidUpdate,
+	}
 
     public enum FolloMeErrorCodes
     {
@@ -83,11 +93,30 @@ namespace Utility
                 case "TripMile":
                     return TripItemEnums.UpdateTripMileage;
                 case "Participants":
-                    return TripItemEnums.UpdateParticipants; 
+                    return TripItemEnums.UpdateParticipants;
+				case "Moments":
+					return TripItemEnums.UpdateMoments;
                 default:
                     return TripItemEnums.InvalidUpdate;
             }
         }
+
+		public static MomentItemEnums GetMomentItemEnum(string val)
+		{
+			switch (val)
+			{
+				case "Title":
+					return MomentItemEnums.UpdateTitle;
+				case "Longitude":
+					return MomentItemEnums.UpdateLongitude;
+				case "Latitude":
+					return MomentItemEnums.UpdateLatitude;
+				case "Creator":
+					return MomentItemEnums.UpdateCreator;
+				default:
+					return MomentItemEnums.InvalidUpdate;
+			}
+		}
     }
 
     public class FolloMeResponse
