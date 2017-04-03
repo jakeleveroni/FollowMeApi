@@ -156,6 +156,18 @@ namespace FollowMeAPI.Controllers
                 {
                     kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
                 }
+                if (Request.Headers.Contains("TripDescription"))
+                {
+                    kvp.Add("TripDescription", Request.Headers.GetValues("TripDescription").FirstOrDefault());
+                }
+                if (Request.Headers.Contains("Participants"))
+                {
+                    kvp.Add("Participants", Request.Headers.GetValues("Participants").FirstOrDefault());
+                }
+                if (Request.Headers.Contains("Moments"))
+                {
+                    kvp.Add("Moments", Request.Headers.GetValues("Moments").FirstOrDefault());
+                }
 
                 if (kvp.Count > 0)
                 {

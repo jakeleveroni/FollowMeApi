@@ -9,11 +9,11 @@ using FollowMeAPI.Sessions;
 
 namespace FollowMeAPI.Controllers
 {
-	[RoutePrefix("Moments")]
+	[RoutePrefix("moments")]
 	public class MomentsController : ApiController
 	{
 		[HttpGet]
-		[Route("moments/get")]
+		[Route("get")]
 		public MomentModel GetMoment()
 		{
 			string token = null;
@@ -54,8 +54,8 @@ namespace FollowMeAPI.Controllers
 		}
 
 		[HttpPost]
-		[Route("moments/new")]
-		public MomentModel PostMoment([FromBody] string jsonModel)
+		[Route("new")]
+		public MomentModel PostMoment([FromBody] MomentModel jsonModel)
 		{
 			string token = null;
 			string tripId = null;
@@ -121,7 +121,7 @@ namespace FollowMeAPI.Controllers
 		}
 
 		[HttpDelete]
-		[Route("moments/delete")]
+		[Route("delete")]
 		public string DeleteMoment()
 		{
 			string token = null;
@@ -163,7 +163,7 @@ namespace FollowMeAPI.Controllers
 		}
 
 		[HttpPatch]
-		[Route("moments/update")]
+		[Route("update")]
 		public string UpdateMoment()
 		{
 			string userId = null;
