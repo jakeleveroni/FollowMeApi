@@ -17,9 +17,8 @@ namespace FollowMeAPI.Controllers
 		public MomentModel GetMoment()
 		{
 			string token = null;
-			string momentId = null;
 
-			if (Request.Headers.Contains("Token"))
+		    if (Request.Headers.Contains("Token"))
 			{
 				token = Request.Headers.GetValues("Token").FirstOrDefault();
 			}
@@ -28,9 +27,9 @@ namespace FollowMeAPI.Controllers
 			{
 				if (Request.Headers.Contains("MomentGuid"))
 				{
-					momentId = Request.Headers.GetValues("MomentGuid").FirstOrDefault();
+				    var momentId = Request.Headers.GetValues("MomentGuid").FirstOrDefault();
 
-					try
+				    try
 					{
 						return JsonConvert.DeserializeObject<MomentModel>(WebApiApplication.db.GetMoment(momentId));
 					}
@@ -40,17 +39,13 @@ namespace FollowMeAPI.Controllers
 						return null;
 					}
 				}
-				else
-				{
-					Tools.logger.Error("[MOMENTS CONTROLLER GET][ERROR] : No moment id provided");
-					return null;
-				}
+
+                Tools.logger.Error("[MOMENTS CONTROLLER GET][ERROR] : No moment id provided");
+			    return null;
 			}
-			else
-			{
-				Tools.logger.Error("[MOMENTS CONTROLLER GET][ERROR] : No token provided");
-				return null;
-			}
+
+			Tools.logger.Error("[MOMENTS CONTROLLER GET][ERROR] : No token provided");
+			return null;
 		}
 
 		[HttpPost]
@@ -58,46 +53,33 @@ namespace FollowMeAPI.Controllers
 		public MomentModel PostMoment([FromBody] MomentModel jsonModel)
 		{
 			string token = null;
-			string tripId = null;
-			string type = null;
+		    string type = null;
 
-			if (Request.Headers.Contains("Token"))
+		    if (Request.Headers.Contains("Token"))
 			{
 				token = Request.Headers.GetValues("Token").FirstOrDefault();
 			}
 
 			if (SessionManager.ValidateSession(token))
 			{
-				dynamic momentObj;
-
 				if (Request.Headers.Contains("TripGuid"))
 				{
-					tripId = Request.Headers.GetValues("TripGuid").FirstOrDefault();
+					var tripId = Request.Headers.GetValues("TripGuid").FirstOrDefault();
 
 					if (Request.Headers.Contains("Type"))
 					{
 						type = Request.Headers.GetValues("Type").FirstOrDefault();
 					}
 
+				    if (tripId == null)
+				    {
+				        return null;
+				    }
+
 					try
 					{
-						switch (type)
-						{
-							case "image":
-								momentObj = JsonConvert.DeserializeObject<ImageMoment>(jsonModel);
-								WebApiApplication.db.AddNewMoment(momentObj, new Guid(tripId));
-								break;
-							case "video":
-								momentObj = JsonConvert.DeserializeObject<VideoMoment>(jsonModel);
-								WebApiApplication.db.AddNewMoment(momentObj, new Guid(tripId));
-								break;
-							case "text":
-								momentObj = JsonConvert.DeserializeObject<TextMoment>(jsonModel);
-								WebApiApplication.db.AddNewMoment(momentObj, new Guid(tripId));
-								break;
-							default:
-								throw new InvalidProgramException();
-						}
+                        MomentModel momentObj = new MomentModel(jsonModel.Title, jsonModel.MomentId, jsonModel.ContentId, jsonModel.Creator, jsonModel.Longitude, jsonModel.Latitude, type);
+						WebApiApplication.db.AddNewMoment(momentObj, new Guid(tripId));
 
 						return momentObj;
 					}
@@ -125,9 +107,8 @@ namespace FollowMeAPI.Controllers
 		public string DeleteMoment()
 		{
 			string token = null;
-			string momentId = null;
 
-			if (Request.Headers.Contains("Token"))
+		    if (Request.Headers.Contains("Token"))
 			{
 				token = Request.Headers.GetValues("Token").FirstOrDefault();
 			}
@@ -136,9 +117,9 @@ namespace FollowMeAPI.Controllers
 			{
 				if (Request.Headers.Contains("Guid"))
 				{
-					momentId = Request.Headers.GetValues("Guid").FirstOrDefault();
+				    var momentId = Request.Headers.GetValues("Guid").FirstOrDefault();
 
-					try
+				    try
 					{
 						WebApiApplication.db.DeleteMoment(momentId);
 						return momentId;

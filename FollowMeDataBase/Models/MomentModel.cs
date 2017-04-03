@@ -1,10 +1,11 @@
 ﻿using System;
 using Amazon.DynamoDBv2.DataModel;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace FollowMeDataBase.Models
 {
-	public abstract class MomentModel
+	public class MomentModel
 	{
 		[DataMember(Name = "Title")]
 		[DynamoDBProperty("Title")]
@@ -40,10 +41,10 @@ namespace FollowMeDataBase.Models
 			Creator = "None";
 			ContentId = new Guid();
 			Longitude = Latitude = "None";
-			Type = "Base";
+			Type = "None";
 		}
 
-		public MomentModel(string title, Guid momentId, Guid contentId, string owner, string longitude, string latitude)
+		public MomentModel(string title, Guid momentId, Guid contentId, string owner, string longitude, string latitude, string type)
 		{
 			Title = title;
 			Longitude = longitude;
@@ -51,7 +52,7 @@ namespace FollowMeDataBase.Models
 			MomentId = momentId;
 			ContentId = contentId;
 			Creator = owner;
-			Type = "Base";
+			Type = type;
 		}
 
 		public MomentModel(MomentModel other)
@@ -62,7 +63,7 @@ namespace FollowMeDataBase.Models
 			Creator = other.Creator;
 			MomentId = other.MomentId;
 			ContentId = other.ContentId;
-			Type = "Base";
+			Type = other.Type;
 		}
 
 		public void GenerateARN()
@@ -71,7 +72,10 @@ namespace FollowMeDataBase.Models
 			throw new NotImplementedException();
 		}
 
-		public abstract string SerializeToJson();
+	    public string SerializeToJson()
+	    {
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
+        }
 
         public static bool operator ==(MomentModel a, MomentModel b)
         {
