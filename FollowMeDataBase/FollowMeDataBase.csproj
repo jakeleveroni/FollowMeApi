@@ -103,9 +103,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility.cs" />
-    <Compile Include="Models\ImageMoment.cs" />
-    <Compile Include="Models\VideoMoment.cs" />
-    <Compile Include="Models\TextMoment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

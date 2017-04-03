@@ -693,7 +693,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			try
 			{
 				m_momentTableContext.PutItem(Document.FromJson(newMoment.SerializeToJson()));
-				UpdateTrip(tripId.ToString(), newMoment.MomentId.ToString(), TripItemEnums.UpdateMoments);
+				UpdateTrip(tripId.ToString(), newMoment.Guid.ToString(), TripItemEnums.UpdateMoments);
 				return true;
 			}
 			catch (Exception ex)
@@ -733,7 +733,7 @@ namespace FollowMeDataBase.DBCallWrappers
 				case MomentItemEnums.UpdateCreator:
 					updateAttribValues.Add(":newCreator", new AttributeValue { S = newValue });
 					updateAtribNames.Add("#C", "Creator");
-					updateExpression = "SET #C = :Creator";
+					updateExpression = "SET #C = :newCreator";
 					break;
 				case MomentItemEnums.UpdateLatitude:
 					updateAttribValues.Add(":newLong", new AttributeValue { S = newValue });
@@ -743,7 +743,7 @@ namespace FollowMeDataBase.DBCallWrappers
 				case MomentItemEnums.UpdateLongitude:
 					updateAttribValues.Add(":newLat", new AttributeValue { S = newValue });
 					updateAtribNames.Add("#LT", "Latitude");
-					updateExpression = "SET #LT = :newLatitude";
+					updateExpression = "SET #LT = :newLat";
 					break;
 				default:
 					Tools.logger.Error("[UPDATE-MOMENT][ERROR] : Invalid update option provided");
@@ -754,8 +754,8 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			var request = new UpdateItemRequest
 			{
-				TableName = m_userTableName,
-				Key = new Dictionary<string, AttributeValue>() { { "Guid", new AttributeValue { S = momentId.ToString() } } },
+				TableName = m_MomentTableName,
+				Key = new Dictionary<string, AttributeValue>() { { "Guid", new AttributeValue { S = momentId } } },
 				ExpressionAttributeNames = updateAtribNames,
 				ExpressionAttributeValues = updateAttribValues,
 				UpdateExpression = updateExpression

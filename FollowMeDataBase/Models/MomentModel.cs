@@ -13,7 +13,7 @@ namespace FollowMeDataBase.Models
 
 		[DataMember(Name = "Guid")]
 		[DynamoDBProperty("Guid")]
-		public Guid MomentId { get; set; }
+		public Guid Guid { get; set; }
 
 		[DataMember(Name = "Longitude")]
 		[DynamoDBProperty("Longitude")]
@@ -44,12 +44,12 @@ namespace FollowMeDataBase.Models
 			Type = "None";
 		}
 
-		public MomentModel(string title, Guid momentId, Guid contentId, string owner, string longitude, string latitude, string type)
+		public MomentModel(string title, Guid guid, Guid contentId, string owner, string longitude, string latitude, string type)
 		{
 			Title = title;
 			Longitude = longitude;
 			Latitude = latitude;
-			MomentId = momentId;
+			Guid = guid;
 			ContentId = contentId;
 			Creator = owner;
 			Type = type;
@@ -61,7 +61,7 @@ namespace FollowMeDataBase.Models
 			Longitude = other.Longitude;
 			Latitude = other.Latitude;
 			Creator = other.Creator;
-			MomentId = other.MomentId;
+			Guid = other.Guid;
 			ContentId = other.ContentId;
 			Type = other.Type;
 		}
