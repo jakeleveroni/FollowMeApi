@@ -78,10 +78,10 @@ namespace FollowMeAPI.Controllers
 
 					try
 					{
-                        MomentModel momentObj = new MomentModel(jsonModel.Title, jsonModel.Guid, jsonModel.ContentId, jsonModel.Creator, jsonModel.Longitude, jsonModel.Latitude, type);
-						WebApiApplication.db.AddNewMoment(momentObj, new Guid(tripId));
+					    jsonModel.Type = type;
+						WebApiApplication.db.AddNewMoment(jsonModel, new Guid(tripId));
 
-						return momentObj;
+						return jsonModel;
 					}
 					catch (Exception ex)
 					{
