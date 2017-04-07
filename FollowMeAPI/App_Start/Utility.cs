@@ -88,7 +88,7 @@ namespace FollowMeAPI
         {
             switch (val)
             {
-                case "Name":
+                case "TripName":
                     return TripItemEnums.UpdateTripName;
                 case "TripMile":
                     return TripItemEnums.UpdateTripMileage;

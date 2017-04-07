@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Http;
 using System.Collections.Generic;
-using FollowMeDataBase.Models;
+using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 
 namespace FollowMeAPI.Controllers
@@ -43,14 +43,14 @@ namespace FollowMeAPI.Controllers
 			{
 				var tripId = Request.Headers.GetValues("guid").FirstOrDefault();
 
-				if (Request.Headers.Contains("type"))
+                if (tripId == null)
+                {
+                    return null;
+                }
+
+                if (Request.Headers.Contains("type"))
 				{
 					type = Request.Headers.GetValues("type").FirstOrDefault();
-				}
-
-				if (tripId == null)
-				{
-				    return null;
 				}
 
 				try

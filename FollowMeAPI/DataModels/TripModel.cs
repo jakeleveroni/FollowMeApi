@@ -9,12 +9,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
+using Newtonsoft.Json;
 
-
-namespace FollowMeDataBase.Models
+namespace FollowMeAPI.DataModels
 {
     [DataContract]
     public class TripModel

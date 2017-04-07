@@ -1,9 +1,9 @@
 ﻿using System;
-using Amazon.DynamoDBv2.DataModel;
 using System.Runtime.Serialization;
+using Amazon.DynamoDBv2.DataModel;
 using Newtonsoft.Json;
 
-namespace FollowMeDataBase.Models
+namespace FollowMeAPI.DataModels
 {
 	public class MomentModel
 	{
@@ -35,14 +35,7 @@ namespace FollowMeDataBase.Models
 		[DynamoDBProperty("Type")]
 		public string Type { get; set; }
 
-		public MomentModel()
-		{
-			Title = "Uninitalized";
-			Creator = "None";
-			ContentId = new Guid();
-			Longitude = Latitude = "None";
-			Type = "None";
-		}
+        public MomentModel() { }
 
 		public MomentModel(string title, Guid guid, Guid contentId, string owner, string longitude, string latitude, string type)
 		{

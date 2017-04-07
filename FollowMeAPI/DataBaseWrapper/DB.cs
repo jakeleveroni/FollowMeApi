@@ -9,10 +9,10 @@
 using System;
 using System.Collections.Generic;
 using FollowMeAPI;
-using FollowMeDataBase.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
+using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 
 

@@ -2,7 +2,9 @@
 using System.Web.Http;
 using System.Linq;
 using System.Collections.Generic;
-using FollowMeDataBase.Models;
+using System.Net;
+using System.Net.Http;
+using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 
 namespace FollowMeAPI.Controllers
@@ -42,6 +44,11 @@ namespace FollowMeAPI.Controllers
         [Route("new")]
         public TripModel PostTripModel([FromBody] TripModel tripJson)
         {
+            if (!ModelState.IsValid)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
             try
             {
                 WebApiApplication.Db.AddNewTrip(tripJson);

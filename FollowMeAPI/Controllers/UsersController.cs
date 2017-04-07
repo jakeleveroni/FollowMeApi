@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Web.Http;
 using System.Linq;
-using FollowMeDataBase.Models;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 
 namespace FollowMeAPI.Controllers
@@ -43,9 +45,15 @@ namespace FollowMeAPI.Controllers
         [Route("new")]
 		public UserModel PostUserModel([FromBody] UserModel jsonUser)
         {
-			try
+            if (!ModelState.IsValid)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            try
 			{
-				WebApiApplication.Db.AddNewUser(jsonUser);
+                if (jsonUser != null)
+				    WebApiApplication.Db.AddNewUser(jsonUser);
 			}
 			catch (Exception ex)
 			{

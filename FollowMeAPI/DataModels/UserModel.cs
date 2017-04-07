@@ -8,14 +8,14 @@
 */
 
 using System;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Serialization;
-using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
+using Newtonsoft.Json;
 
-namespace FollowMeDataBase.Models
+namespace FollowMeAPI.DataModels
 {
     [DataContract]
     [DynamoDBTable("Users")]
@@ -67,6 +67,8 @@ namespace FollowMeDataBase.Models
         public List<Guid> Friends { get; set; }
 
         // METHODS
+        public UserModel(){ }
+
         public UserModel(bool isValid)
         {
             if (!isValid)

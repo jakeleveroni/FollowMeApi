@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
-using FollowMeDataBase.Models;
+using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 
 namespace FollowMeAPI.Controllers
