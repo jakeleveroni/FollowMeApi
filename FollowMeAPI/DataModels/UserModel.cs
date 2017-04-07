@@ -10,6 +10,7 @@
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
@@ -24,6 +25,10 @@ namespace FollowMeDataBase.Models
         [DataMember(Name="Guid")]
         [DynamoDBHashKey("Guid")]
         public Guid UserId { get; set; }
+
+        [DataMember(Name = "ActiveTrip")]
+        [DynamoDBProperty("ActiveTrip")]
+        public Guid ActiveTrip { get; set; }
 
         [DataMember(Name = "UserName")]
         [DynamoDBProperty("UserName")]
@@ -61,12 +66,21 @@ namespace FollowMeDataBase.Models
         [DynamoDBProperty("Friends")]
         public List<Guid> Friends { get; set; }
 
-
-
         // METHODS
-        public UserModel()
+        public UserModel(bool isValid)
         {
-             
+            if (!isValid)
+            {
+                UserId = new Guid();
+                UserName = null;
+                Name = null;
+                Email = null;
+                Password = null;
+                BirthDate = null;
+                TripIds = null;
+                Friends = null;
+                TotalMilesTraveled = 0;
+            }
         }
 
         public UserModel(Guid id, string userName, string name, string email, string pass, DateTime bd, ulong miles)
@@ -76,7 +90,7 @@ namespace FollowMeDataBase.Models
             Name = name;
             Email = email;
             Password = pass;
-            BirthDate = bd.ToString();
+            BirthDate = bd.ToString(CultureInfo.InvariantCulture);
             TripIds = new List<string>();
             Friends = new List<Guid>();
             TotalMilesTraveled = miles;
@@ -89,7 +103,7 @@ namespace FollowMeDataBase.Models
             Name = name;
             Email = email;
             Password = pass;
-            BirthDate = bd.ToString();
+            BirthDate = bd.ToString(CultureInfo.InvariantCulture);
             TotalMilesTraveled = miles;
 
             if (friends != null)
@@ -98,7 +112,7 @@ namespace FollowMeDataBase.Models
             }
             else
             {
-                friends = new List<Guid>();
+                Friends = new List<Guid>();
             }
 
             if (trips != null)

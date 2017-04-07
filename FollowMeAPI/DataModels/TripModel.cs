@@ -79,6 +79,19 @@ namespace FollowMeDataBase.Models
             Moments = new List<Guid>(other.Moments);
         }
 
+        public TripModel(bool isInvalid)
+        {
+            if (isInvalid)
+            {
+                TripId = new Guid();
+                TripName = null;
+                TripMileage = 0;
+                TripDescription = null;
+                Moments = null;
+                Participants = null;
+            }
+        }
+
         public string SerializeToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);

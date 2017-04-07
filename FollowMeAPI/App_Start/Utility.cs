@@ -1,6 +1,6 @@
 ﻿using log4net;
 
-namespace Utility
+namespace FollowMeAPI
 {
     public enum UserItemEnums
     {
@@ -22,17 +22,17 @@ namespace Utility
         UpdateParticipants,
         UpdateTripMileage,
         UpdateMoments,
-		InvalidUpdate,
+        InvalidUpdate,
     }
 
-	public enum MomentItemEnums
-	{
-		UpdateTitle = 0,
-		UpdateLongitude,
-		UpdateLatitude,
-		UpdateCreator,
-		InvalidUpdate,
-	}
+    public enum MomentItemEnums
+    {
+        UpdateTitle = 0,
+        UpdateLongitude,
+        UpdateLatitude,
+        UpdateCreator,
+        InvalidUpdate,
+    }
 
     public enum FolloMeErrorCodes
     {
@@ -94,29 +94,29 @@ namespace Utility
                     return TripItemEnums.UpdateTripMileage;
                 case "Participants":
                     return TripItemEnums.UpdateParticipants;
-				case "Moments":
-					return TripItemEnums.UpdateMoments;
+                case "Moments":
+                    return TripItemEnums.UpdateMoments;
                 default:
                     return TripItemEnums.InvalidUpdate;
             }
         }
 
-		public static MomentItemEnums GetMomentItemEnum(string val)
-		{
-			switch (val)
-			{
-				case "Title":
-					return MomentItemEnums.UpdateTitle;
-				case "Longitude":
-					return MomentItemEnums.UpdateLongitude;
-				case "Latitude":
-					return MomentItemEnums.UpdateLatitude;
-				case "Creator":
-					return MomentItemEnums.UpdateCreator;
-				default:
-					return MomentItemEnums.InvalidUpdate;
-			}
-		}
+        public static MomentItemEnums GetMomentItemEnum(string val)
+        {
+            switch (val)
+            {
+                case "Title":
+                    return MomentItemEnums.UpdateTitle;
+                case "Longitude":
+                    return MomentItemEnums.UpdateLongitude;
+                case "Latitude":
+                    return MomentItemEnums.UpdateLatitude;
+                case "Creator":
+                    return MomentItemEnums.UpdateCreator;
+                default:
+                    return MomentItemEnums.InvalidUpdate;
+            }
+        }
     }
 
     public class FolloMeResponse

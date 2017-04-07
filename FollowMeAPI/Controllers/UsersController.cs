@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Web.Http;
-using System.Net.Http;
 using System.Linq;
 using FollowMeDataBase.Models;
-using FollowMeAPI.Sessions;
-using Utility;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace FollowMeAPI.Controllers
 {
@@ -15,205 +13,152 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("get")]
-        public HttpResponseMessage GetUserModel()
+        public UserModel GetUserModel()
         {
             string userId = null;
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
 
-			if (Request.Headers.Contains("Token"))
-			{
-				token = Request.Headers.GetValues("Token").FirstOrDefault();
+            if (Request.Headers.Contains("guid"))
+            {
+                userId = Request.Headers.GetValues("guid").FirstOrDefault();
 			}
 
-            if (SessionManager.ValidateSession(token))
+            if (userId != null)
             {
-                if (Request.Headers.Contains("guid"))
+                try
                 {
-                    userId = Request.Headers.GetValues("guid").FirstOrDefault();
-				}
-
-                if (userId != null)
-                {
-					response.Headers.Add("guid", userId);
-					
-                    try
-                    {
-                        var str = WebApiApplication.db.GetUser(userId);
-                        Tools.logger.Debug("Serialized Object : " + str);
-						response.Headers.Add("UserModel", str);
-						response.StatusCode = System.Net.HttpStatusCode.OK;
-						return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
-						throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
-					}
+                    var str = WebApiApplication.Db.GetUser(userId);
+                    Tools.logger.Debug("Serialized Object : " + str);
+					return JsonConvert.DeserializeObject<UserModel>(str);
                 }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[GET USER][ERROR] : Could not get the user, " + ex.Message);
+				}
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            return new UserModel(false);
         }
 
         [HttpPost]
         [Route("new")]
-		public HttpResponseMessage PostUserModel([FromBody] UserModel jsonUser)
+		public UserModel PostUserModel([FromBody] UserModel jsonUser)
         {
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
-
-            if (Request.Headers.Contains("Token"))
-            {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
-            }
-
-			if (SessionManager.ValidateSession(token))
+			try
 			{
-				try
-				{
-					WebApiApplication.db.AddNewUser(jsonUser);
-					response.Headers.Add("UserModel", jsonUser.ToString());
-					response.StatusCode = System.Net.HttpStatusCode.OK;
-					return response;
-
-				}
-				catch (Exception ex)
-				{
-					Tools.logger.Error("[POST USER][ERROR] : Could not post user to db" + ex.Message);
-					throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
-				}
+				WebApiApplication.Db.AddNewUser(jsonUser);
+			}
+			catch (Exception ex)
+			{
+				Tools.logger.Error("[POST USER][ERROR] : Could not post user to Db" + ex.Message);
 			}
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
-		}
+            return jsonUser;
+        }
 
         [HttpDelete]
         [Route("delete")]
-        public HttpResponseMessage DeleteUserModel()
+        public bool DeleteUserModel()
         {
             string userId = string.Empty;
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
 
-            if (Request.Headers.Contains("Token"))
-            {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
-            }
-
-			if (SessionManager.ValidateSession(token))
+			if (Request.Headers.Contains("guid"))
 			{
-				if (Request.Headers.Contains("guid"))
-				{
-					userId = Request.Headers.GetValues("guid").FirstOrDefault();
-				}
+				userId = Request.Headers.GetValues("guid").FirstOrDefault();
+			}
 
-				if (userId != null)
+			if (userId != null)
+			{
+				try
 				{
-					try
-					{
-						WebApiApplication.db.RemoveUser(userId);
-						response.StatusCode = System.Net.HttpStatusCode.OK;
-						return response;
-					}
-					catch (Exception ex)
-					{
-						Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from db, " + ex.Message);
-						throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
-					}
+					WebApiApplication.Db.RemoveUser(userId);
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from Db, " + ex.Message);
 				}
 			}
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.ExpectationFailed);
+            return false;
         }
 
 		[HttpPatch]
         [Route("update")]
-        public HttpResponseMessage PatchUserModel()
+        public bool PatchUserModel()
         {
             string userId = null;
-            string token = null;
             Dictionary<string, string> kvp = new Dictionary<string, string>();
-			HttpResponseMessage response = new HttpResponseMessage();
 
-            if (Request.Headers.Contains("Token"))
+
+            if (Request.Headers.Contains("guid"))
             {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
+                userId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (SessionManager.ValidateSession(token))
+            if (userId == null)
             {
-                if (Request.Headers.Contains("guid"))
-                {
-                    userId = Request.Headers.GetValues("guid").FirstOrDefault();
-                }
+				throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            }
 
-                if (userId == null)
-                {
-					throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
-                }
+            // the header is parsed out this way because the header collection is implemented in 
+            // a fucking stupid way where you cant get the keys of the header, they are just hard coded string 
+            // comparisons on the header collection. Fucking unbelievable...
+            if (Request.Headers.Contains("Name"))
+            {
+                kvp.Add("Name", Request.Headers.GetValues("Name").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Email"))
+            {
+                kvp.Add("Email", Request.Headers.GetValues("Email").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("BirthDate"))
+            {
+                kvp.Add("BirthDate", Request.Headers.GetValues("BirthDate").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("NumberOfTrips"))
+            {
+                kvp.Add("NumberOfTrips", Request.Headers.GetValues("NumberOfTrips").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Password"))
+            {
+                kvp.Add("Password", Request.Headers.GetValues("Password").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("TotalMilesTraveled"))
+            {
+                kvp.Add("TotalMilesTraveled", Request.Headers.GetValues("TotalMilesTraveled").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("UserName"))
+            {
+                kvp.Add("UserName", Request.Headers.GetValues("UserName").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("TripIds"))
+            {
+                kvp.Add("TripIds", Request.Headers.GetValues("TripIds").FirstOrDefault());
+            }
 
-                // the header is parsed out this way because the header collection is implemented in 
-                // a fucking stupid way where you cant get the keys of the header, they are just hard coded string 
-                // comparisons on the header collection. Fucking unbelievable...
-                if (Request.Headers.Contains("Name"))
+            if (kvp.Count > 0)
+            {
+                try
                 {
-                    kvp.Add("Name", Request.Headers.GetValues("Name").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("Email"))
-                {
-                    kvp.Add("Email", Request.Headers.GetValues("Email").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("BirthDate"))
-                {
-                    kvp.Add("BirthDate", Request.Headers.GetValues("BirthDate").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("NumberOfTrips"))
-                {
-                    kvp.Add("NumberOfTrips", Request.Headers.GetValues("NumberOfTrips").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("Password"))
-                {
-                    kvp.Add("Password", Request.Headers.GetValues("Password").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("TotalMilesTraveled"))
-                {
-                    kvp.Add("TotalMilesTraveled", Request.Headers.GetValues("TotalMilesTraveled").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("UserName"))
-                {
-                    kvp.Add("UserName", Request.Headers.GetValues("UserName").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("TripIds"))
-                {
-                    kvp.Add("TripIds", Request.Headers.GetValues("TripIds").FirstOrDefault());
-                }
 
-                if (kvp.Count > 0)
-                {
-                    try
+                    foreach (KeyValuePair<string, string> entry in kvp)
                     {
+                        UserItemEnums updateType = Tools.GetUserUpdateEnum(entry.Key);
 
-                        foreach (KeyValuePair<string, string> entry in kvp)
+                        if (updateType != UserItemEnums.InvalidUpdate && entry.Value != null)
                         {
-                            UserItemEnums updateType = Tools.GetUserUpdateEnum(entry.Key);
-
-                            if (updateType != UserItemEnums.InvalidUpdate && entry.Value != null)
-                            {
-                                WebApiApplication.db.UpdateUser(userId, entry.Value, updateType);
-								response.StatusCode = System.Net.HttpStatusCode.OK;
-                                return response;
-                            }
+                            WebApiApplication.Db.UpdateUser(userId, entry.Value, updateType);
+                            return true;
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[UPDATE USER][ERROR] : Could not update user in db, " + ex.Message);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[UPDATE USER][ERROR] : Could not update user in Db, " + ex.Message);
                 }
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NonAuthoritativeInformation);
+            return false;
         }
     }
 }

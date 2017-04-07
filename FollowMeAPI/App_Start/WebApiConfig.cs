@@ -1,12 +1,11 @@
-﻿using System;
-using System.Web.Http;
+﻿using System.Web.Http;
 using log4net.Config;
 
 namespace FollowMeAPI
 {
     public static class WebApiConfig
     {
-		public const string Version = "1.0.0.1";
+		public const string Version = "1.2.0";
 
         public const string LastCommit = "Updated the content upload download implementation to test multiple methods (multipart/base 64 string)";
 
@@ -14,7 +13,7 @@ namespace FollowMeAPI
         {
             // enable log4net logging for debugging
             BasicConfigurator.Configure();
-            Utility.Tools.logger.Info("[APPLICATION START]");
+            Tools.logger.Info("[APPLICATION START]");
 
             // Web API routes
             config.MapHttpAttributeRoutes();

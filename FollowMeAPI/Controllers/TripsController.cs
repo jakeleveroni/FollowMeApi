@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Web.Http;
-using System.Net.Http;
 using System.Linq;
 using System.Collections.Generic;
 using FollowMeDataBase.Models;
 using Newtonsoft.Json;
-using FollowMeAPI.Sessions;
-using Utility;
 
 namespace FollowMeAPI.Controllers
 {
@@ -15,185 +12,136 @@ namespace FollowMeAPI.Controllers
     {
         [HttpGet]
         [Route("get")]
-        public HttpResponseMessage GetTripModel()
+        public TripModel GetTripModel()
         {
             string tripId = null;
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
 
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (Request.Headers.Contains("Token"))
+            if (tripId != null)
             {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
-            }
-
-            if (SessionManager.ValidateSession(token))
-            {
-                if (tripId != null)
+                try
                 {
-                    try
-                    {
-                        var str = WebApiApplication.db.GetTrip(tripId);
-                        Tools.logger.Debug("Serialized Object : " + str);
-						response.Headers.Add("TripModel", str);
-						response.StatusCode = System.Net.HttpStatusCode.OK;
-						return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
-						throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
-                    }
+                    var str = WebApiApplication.Db.GetTrip(tripId);
+                    Tools.logger.Debug("Serialized Object : " + str);
+                    return JsonConvert.DeserializeObject<TripModel>(str);
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[GET TRIP][ERROR] : Could not get the trip, " + ex.Message);
                 }
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            return new TripModel(false);
         }
 
         [HttpPost]
         [Route("new")]
-        public HttpResponseMessage PostTripModel([FromBody] TripModel tripJson)
+        public TripModel PostTripModel([FromBody] TripModel tripJson)
         {
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
-
-            if (Request.Headers.Contains("Token"))
+            try
             {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
+                WebApiApplication.Db.AddNewTrip(tripJson);
+            }
+            catch (Exception ex)
+            {
+                Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to Db" + ex.Message);
             }
 
-            if (SessionManager.ValidateSession(token))
-            {
-                try
-                {
-                    WebApiApplication.db.AddNewTrip(tripJson);
-					response.StatusCode = System.Net.HttpStatusCode.OK;
-					return response;
-                }
-                catch (Exception ex)
-                {
-                    Tools.logger.Error("[POST TRIP][ERROR] : Could not post trip to db" + ex.Message);
-                }
-            }
-
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            return tripJson;
         }
 
         [HttpDelete]
         [Route("delete")]
-		public HttpResponseMessage DeleteTripModel()
+		public bool DeleteTripModel()
         {
             string tripId= string.Empty;
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
 			
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (Request.Headers.Contains("Token"))
+            if (tripId != null)
             {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
-            }
-
-            if (SessionManager.ValidateSession(token))
-            {
-                if (tripId != null)
+                try
                 {
-                    try
-                    {
-                        WebApiApplication.db.RemoveTrip(tripId);
-						response.StatusCode = System.Net.HttpStatusCode.OK;
-                        
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from db, " + ex.Message);
-                    }
+                    WebApiApplication.Db.RemoveTrip(tripId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[REMOVE TRIP][ERROR] : Could not remove trip from Db, " + ex.Message);
                 }
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            return false;
         }
 
         [HttpPatch]
         [Route("update")]
-        public HttpResponseMessage PatchTripModel()
+        public bool PatchTripModel()
         {
-            string token = null;
-			HttpResponseMessage response = new HttpResponseMessage();
+            string tripId = null;
+            Dictionary<string, string> kvp = new Dictionary<string, string>();
 
-            if (Request.Headers.Contains("Token"))
+            if (Request.Headers.Contains("guid"))
             {
-                token = Request.Headers.GetValues("Token").FirstOrDefault();
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
             }
 
-            if (SessionManager.ValidateSession(token))
+            if (tripId == null)
             {
-                string tripId = null;
-                Dictionary<string, string> kvp = new Dictionary<string, string>();
+				return false;
+            }
 
-                if (Request.Headers.Contains("guid"))
-                {
-                    tripId = Request.Headers.GetValues("guid").FirstOrDefault();
-                }
+            if (Request.Headers.Contains("TripName"))
+            {
+                kvp.Add("TripName", Request.Headers.GetValues("TripName").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Mileage"))
+            {
+                kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("TripDescription"))
+            {
+                kvp.Add("TripDescription", Request.Headers.GetValues("TripDescription").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Participants"))
+            {
+                kvp.Add("Participants", Request.Headers.GetValues("Participants").FirstOrDefault());
+            }
+            if (Request.Headers.Contains("Moments"))
+            {
+                kvp.Add("Moments", Request.Headers.GetValues("Moments").FirstOrDefault());
+            }
 
-                if (tripId == null)
+            if (kvp.Count > 0)
+            {
+                try
                 {
-					throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
-                }
-
-                if (Request.Headers.Contains("TripName"))
-                {
-                    kvp.Add("TripName", Request.Headers.GetValues("TripName").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("Mileage"))
-                {
-                    kvp.Add("Mileage", Request.Headers.GetValues("Mileage").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("TripDescription"))
-                {
-                    kvp.Add("TripDescription", Request.Headers.GetValues("TripDescription").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("Participants"))
-                {
-                    kvp.Add("Participants", Request.Headers.GetValues("Participants").FirstOrDefault());
-                }
-                if (Request.Headers.Contains("Moments"))
-                {
-                    kvp.Add("Moments", Request.Headers.GetValues("Moments").FirstOrDefault());
-                }
-
-                if (kvp.Count > 0)
-                {
-                    try
+                    foreach (KeyValuePair<string, string> entry in kvp)
                     {
-                        foreach (KeyValuePair<string, string> entry in kvp)
+                        TripItemEnums updateType = Tools.GetTripItemEnum(entry.Key);
+
+                        if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
                         {
-                            TripItemEnums updateType = Tools.GetTripItemEnum(entry.Key);
-
-                            if (updateType != TripItemEnums.InvalidUpdate && entry.Value != null)
-                            {
-                                WebApiApplication.db.UpdateTrip(tripId, entry.Value, updateType);
-                            }
+                            WebApiApplication.Db.UpdateTrip(tripId, entry.Value, updateType);
                         }
+                    }
 
-						response.StatusCode = System.Net.HttpStatusCode.OK;
-						return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in db, " + ex.Message);
-                    }
+					return  true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in Db, " + ex.Message);
                 }
             }
 
-			throw new HttpResponseException(System.Net.HttpStatusCode.NoContent);
+            return false;
         }
     }
 }

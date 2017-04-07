@@ -8,22 +8,23 @@
 
 using System;
 using System.Collections.Generic;
+using FollowMeAPI;
 using FollowMeDataBase.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
 using Newtonsoft.Json;
-using Utility;
+
 
 namespace FollowMeDataBase.DBCallWrappers
 {
 	public class DB : IDisposable
 	{
-		AmazonDynamoDBConfig ddbConfig;
-		AmazonDynamoDBClient client;
-		private Table m_userTableContext;
-		private Table m_tripTableContext;
-		private Table m_momentTableContext;
+		private AmazonDynamoDBConfig _config;
+		private readonly AmazonDynamoDBClient _client;
+		private Table _userTableContext;
+		private Table _tripTableContext;
+		private Table _momentTableContext;
 		private readonly string m_userTableName = "Users";
 		private readonly string m_tripTableName = "Trips";
 		private readonly string m_MomentTableName = "Moments";
@@ -39,8 +40,8 @@ namespace FollowMeDataBase.DBCallWrappers
 			// Initialize the database 
 			try
 			{
-				ddbConfig = new AmazonDynamoDBConfig();
-				ddbConfig.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
+				_config = new AmazonDynamoDBConfig();
+				_config.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
 			}
 			catch (Exception ex)
 			{
@@ -50,11 +51,11 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				client = new AmazonDynamoDBClient(ddbConfig);
+				_client = new AmazonDynamoDBClient(_config);
 			}
 			catch (Exception ex)
 			{
-				Tools.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+				Tools.logger.Error("\nError: failed to create a DynamoDB _client; " + ex.Message);
 				return;
 			}
 
@@ -67,8 +68,8 @@ namespace FollowMeDataBase.DBCallWrappers
 			// Initialize the database 
 			try
 			{
-				ddbConfig = new AmazonDynamoDBConfig();
-				ddbConfig.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
+				_config = new AmazonDynamoDBConfig();
+				_config.ServiceURL = "https://dynamodb.us-west-2.amazonaws.com/";
 			}
 			catch (Exception ex)
 			{
@@ -78,11 +79,11 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				client = new AmazonDynamoDBClient(accessKey, secretAccessKey, token, ddbConfig);
+				_client = new AmazonDynamoDBClient(accessKey, secretAccessKey, token, _config);
 			}
 			catch (Exception ex)
 			{
-				Tools.logger.Error("\nError: failed to create a DynamoDB client; " + ex.Message);
+				Tools.logger.Error("\nError: failed to create a DynamoDB _client; " + ex.Message);
 				return;
 			}
 
@@ -96,9 +97,9 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				m_userTableContext = Table.LoadTable(client, m_userTableName);
-				m_tripTableContext = Table.LoadTable(client, m_tripTableName);
-				m_momentTableContext = Table.LoadTable(client, m_MomentTableName);
+				_userTableContext = Table.LoadTable(_client, m_userTableName);
+				_tripTableContext = Table.LoadTable(_client, m_tripTableName);
+				_momentTableContext = Table.LoadTable(_client, m_MomentTableName);
 			}
 			catch (Exception ex)
 			{
@@ -112,7 +113,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_userTableContext.PutItem(Document.FromJson(newUser.SerializeToJson()));
+				_userTableContext.PutItem(Document.FromJson(newUser.SerializeToJson()));
 				return true;
 			}
 			catch (Exception ex)
@@ -197,7 +198,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				var response = client.UpdateItem(request);
+				var response = _client.UpdateItem(request);
 				return true;
 			}
 			catch (Exception ex)
@@ -211,7 +212,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_userTableContext.DeleteItem(oldUser.UserId.ToString());
+				_userTableContext.DeleteItem(oldUser.UserId.ToString());
 				return true;
 			}
 			catch (Exception ex)
@@ -225,7 +226,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_userTableContext.DeleteItem(primaryKey);
+				_userTableContext.DeleteItem(primaryKey);
 				return true;
 			}
 			catch (Exception ex)
@@ -239,7 +240,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				Document doc = m_userTableContext.GetItem(primaryKey);
+				Document doc = _userTableContext.GetItem(primaryKey);
 				return doc.ToJson();
 			}
 			catch (Exception ex)
@@ -253,7 +254,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				Document doc = m_userTableContext.GetItem(user.UserId.ToString());
+				Document doc = _userTableContext.GetItem(user.UserId.ToString());
 				var jsonDoc = doc.ToJson();
 				return (UserModel)JsonConvert.DeserializeObject(jsonDoc, typeof(UserModel));
 			}
@@ -269,7 +270,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			Document doc = null;
 			try
 			{
-				doc = m_userTableContext.GetItem(user.UserId.ToString());
+				doc = _userTableContext.GetItem(user.UserId.ToString());
 				return !(doc == null);
 			}
 			catch (Exception ex)
@@ -284,7 +285,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			Document doc = null;
 			try
 			{
-				doc = m_userTableContext.GetItem(userId);
+				doc = _userTableContext.GetItem(userId);
 				return !(doc == null);
 			}
 			catch (Exception ex)
@@ -324,7 +325,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			try
 			{
 				Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for user with username \'" + userName + "\'");
-				response = client.Query(request);
+				response = _client.Query(request);
 			}
 			catch (Exception ex)
 			{
@@ -375,7 +376,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			try
 			{
 				Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with name \'" + name + "\'");
-				response = client.Query(request);
+				response = _client.Query(request);
 			}
 			catch (Exception ex)
 			{
@@ -426,7 +427,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			try
 			{
 				Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for users with UserName \'" + userName + "\'");
-				response = client.Query(request);
+				response = _client.Query(request);
 			}
 			catch (Exception ex)
 			{
@@ -457,7 +458,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_tripTableContext.PutItem(Document.FromJson(newTrip.SerializeToJson()));
+				_tripTableContext.PutItem(Document.FromJson(newTrip.SerializeToJson()));
 				return true;
 			}
 			catch (Exception ex)
@@ -517,7 +518,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				var response = client.UpdateItem(request);
+				var response = _client.UpdateItem(request);
 				return true;
 			}
 			catch (Exception ex)
@@ -531,7 +532,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_tripTableContext.DeleteItem(oldTrip.TripId.ToString());
+				_tripTableContext.DeleteItem(oldTrip.TripId.ToString());
 				return true;
 			}
 			catch (Exception ex)
@@ -545,7 +546,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_tripTableContext.DeleteItem(primaryKey);
+				_tripTableContext.DeleteItem(primaryKey);
 				return true;
 			}
 			catch (Exception ex)
@@ -559,7 +560,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				Document doc = m_tripTableContext.GetItem(primaryKey);
+				Document doc = _tripTableContext.GetItem(primaryKey);
 				return doc.ToJson();
 			}
 			catch (Exception ex)
@@ -573,7 +574,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				Document doc = m_userTableContext.GetItem(trip.TripId.ToString());
+				Document doc = _userTableContext.GetItem(trip.TripId.ToString());
 				var jsonDoc = doc.ToJson();
 				return (TripModel)JsonConvert.DeserializeObject(jsonDoc, typeof(TripModel));
 			}
@@ -589,7 +590,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			Document doc = null;
 			try
 			{
-				doc = m_userTableContext.GetItem(trip.TripId.ToString());
+				doc = _userTableContext.GetItem(trip.TripId.ToString());
 				return !(doc == null);
 			}
 			catch (Exception ex)
@@ -604,7 +605,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			Document doc = null;
 			try
 			{
-				doc = m_tripTableContext.GetItem(tripId);
+				doc = _tripTableContext.GetItem(tripId);
 				return !(doc == null);
 			}
 			catch (Exception ex)
@@ -641,7 +642,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			try
 			{
 				Tools.logger.Info("[DB-CALL-WRAPPER][NOTE] : Querying for trips with name \'" + tripName + "\'");
-				response = client.Query(request);
+				response = _client.Query(request);
 			}
 			catch (Exception ex)
 			{
@@ -677,7 +678,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				Document doc = m_momentTableContext.GetItem(momentId);
+				Document doc = _momentTableContext.GetItem(momentId);
 				return doc.ToJson();
 			}
 			catch (Exception ex)
@@ -689,10 +690,10 @@ namespace FollowMeDataBase.DBCallWrappers
 
 		public bool AddNewMoment(MomentModel newMoment, Guid tripId)
 		{
-			// add the moment to the db and update the trip to have the location of the moment
+			// add the moment to the Db and update the trip to have the location of the moment
 			try
 			{
-				m_momentTableContext.PutItem(Document.FromJson(newMoment.SerializeToJson()));
+				_momentTableContext.PutItem(Document.FromJson(newMoment.SerializeToJson()));
 				UpdateTrip(tripId.ToString(), newMoment.Guid.ToString(), TripItemEnums.UpdateMoments);
 				return true;
 			}
@@ -707,7 +708,7 @@ namespace FollowMeDataBase.DBCallWrappers
 		{
 			try
 			{
-				m_momentTableContext.DeleteItem(momentId);
+				_momentTableContext.DeleteItem(momentId);
 				return true;
 			}
 			catch (Exception ex)
@@ -763,7 +764,7 @@ namespace FollowMeDataBase.DBCallWrappers
 
 			try
 			{
-				var response = client.UpdateItem(request);
+				var response = _client.UpdateItem(request);
 				return true;
 			}
 			catch (Exception ex)
