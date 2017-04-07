@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using FollowMeAPI.WebSockets;
 using log4net.Config;
 
 namespace FollowMeAPI
@@ -13,6 +14,8 @@ namespace FollowMeAPI
         {
             // enable log4net logging for debugging
             BasicConfigurator.Configure();
+            FolloMeWebSocketServer FolloMeWSS = new FolloMeWebSocketServer();
+
             Tools.logger.Info("[APPLICATION START]");
 
             // Web API routes
