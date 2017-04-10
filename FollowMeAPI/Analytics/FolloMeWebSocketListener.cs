@@ -13,10 +13,10 @@ namespace FollowMeAPI.Analytics
         protected override void OnMessage(MessageEventArgs message)
         {
             // all possible message
-            if (message.Data == "Hello")
-            {
-                Send("World");
-            }
+            //if (message.Data == "Hello")
+            //{
+            //    Send("World");
+            //}
         }
     }
 }

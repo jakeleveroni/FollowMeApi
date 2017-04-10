@@ -154,6 +154,7 @@
     <Compile Include="Controllers\TripsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DataBaseWrapper\DB.cs" />
+    <Compile Include="DataModels\BadgeModel.cs" />
     <Compile Include="DataModels\MomentModel.cs" />
     <Compile Include="DataModels\TripModel.cs" />
     <Compile Include="DataModels\UserModel.cs" />

@@ -5,14 +5,20 @@ using Newtonsoft.Json;
 
 namespace FollowMeAPI.DataModels
 {
-	public class MomentModel
+    [DataContract]
+    [DynamoDBTable("Moments")]
+    public class MomentModel
 	{
 		[DataMember(Name = "Title")]
 		[DynamoDBProperty("Title")]
 		public string Title { get; set; }
 
-		[DataMember(Name = "Guid")]
-		[DynamoDBProperty("Guid")]
+        [DataMember(Name = "SubTitle")]
+        [DynamoDBProperty("SubTitle")]
+        public string SubTitle { get; set; }
+
+        [DataMember(Name = "Guid")]
+		[DynamoDBHashKey("Guid")]
 		public Guid Guid { get; set; }
 
 		[DataMember(Name = "Longitude")]
@@ -37,9 +43,10 @@ namespace FollowMeAPI.DataModels
 
         public MomentModel() { }
 
-		public MomentModel(string title, Guid guid, Guid contentId, string owner, string longitude, string latitude, string type)
+		public MomentModel(string title, string subTitle, Guid guid, Guid contentId, string owner, string longitude, string latitude, string type)
 		{
 			Title = title;
+		    SubTitle = subTitle;
 			Longitude = longitude;
 			Latitude = latitude;
 			Guid = guid;
@@ -57,12 +64,7 @@ namespace FollowMeAPI.DataModels
 			Guid = other.Guid;
 			ContentId = other.ContentId;
 			Type = other.Type;
-		}
-
-		public void GenerateARN()
-		{
-			//TODO
-			throw new NotImplementedException();
+		    SubTitle = other.SubTitle;
 		}
 
 	    public string SerializeToJson()

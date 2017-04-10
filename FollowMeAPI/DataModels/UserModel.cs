@@ -38,6 +38,10 @@ namespace FollowMeAPI.DataModels
         [DynamoDBProperty("Name")]
         public string Name { get; set; }
 
+        [DataMember(Name = "Bio")]
+        [DynamoDBProperty("Bio")]
+        public string Bio { get; set; }
+
         [DataMember(Name = "Email")]
         [DynamoDBProperty("Email")]
         public string Email { get; set; }
@@ -66,6 +70,18 @@ namespace FollowMeAPI.DataModels
         [DynamoDBProperty("Friends")]
         public List<Guid> Friends { get; set; }
 
+        [DataMember(Name = "Followers")]
+        [DynamoDBProperty("Followers")]
+        public List<Guid> Followers { get; set; }
+
+        [DataMember(Name = "Following")]
+        [DynamoDBProperty("Following")]
+        public List<Guid> Following { get; set; }
+
+        [DataMember(Name="Badges")]
+        [DynamoDBProperty("Badges")]
+        public List<int> Badges { get; set; }
+
         // METHODS
         public UserModel(){ }
 
@@ -82,6 +98,10 @@ namespace FollowMeAPI.DataModels
                 TripIds = null;
                 Friends = null;
                 TotalMilesTraveled = 0;
+                Badges = null;
+                Bio = null;
+                Followers = null;
+                Following = null;
             }
         }
 
@@ -94,11 +114,32 @@ namespace FollowMeAPI.DataModels
             Password = pass;
             BirthDate = bd.ToString(CultureInfo.InvariantCulture);
             TripIds = new List<string>();
+            Badges = new List<int>();
             Friends = new List<Guid>();
+            Followers = new List<Guid>();
+            Following = new List<Guid>();
             TotalMilesTraveled = miles;
         }
 
-        public UserModel(Guid id, string userName, string name, string email, string pass, DateTime bd, ulong miles, List<Guid> friends = null, List<string> trips = null)
+        public UserModel(Guid id, string userName, string bio, string name, string email, string pass, DateTime bd, ulong miles)
+        {
+            UserId = id;
+            UserName = userName;
+            Name = name;
+            Bio = bio;
+            Email = email;
+            Password = pass;
+            BirthDate = bd.ToString(CultureInfo.InvariantCulture);
+            TripIds = new List<string>();
+            Badges = new List<int>();
+            Friends = new List<Guid>();
+            Followers = new List<Guid>();
+            Following = new List<Guid>();
+            TotalMilesTraveled = miles;
+        }
+
+        public UserModel(Guid id, string userName, string bio, string name, string email, string pass, DateTime bd, ulong miles, 
+            List<Guid> friends = null, List<string> trips = null, List<int> badges = null, List<Guid> followers = null, List<Guid> following = null)
         {
             UserId = id;
             UserName = userName;
@@ -107,24 +148,13 @@ namespace FollowMeAPI.DataModels
             Password = pass;
             BirthDate = bd.ToString(CultureInfo.InvariantCulture);
             TotalMilesTraveled = miles;
+            Bio = bio;
 
-            if (friends != null)
-            {
-                Friends = new List<Guid>(friends);
-            }
-            else
-            {
-                Friends = new List<Guid>();
-            }
-
-            if (trips != null)
-            {
-                TripIds = new List<string>(trips);
-            }
-            else
-            {
-                TripIds = new List<string>();
-            }
+            Friends = friends != null ? new List<Guid>(friends) : new List<Guid>();
+            TripIds = trips != null ? new List<string>(trips) : new List<string>();
+            Badges = badges != null ? new List<int>(badges) : new List<int>();
+            Followers = followers != null ? new List<Guid>(followers) : new List<Guid>();
+            Following = following != null ? new List<Guid>(following) : new List<Guid>();
 
             NumberOfTrips = (uint)TripIds.Count;
         }
@@ -138,8 +168,12 @@ namespace FollowMeAPI.DataModels
             Password = other.Password;
             TripIds = new List<string>(other.TripIds);
             Friends = new List<Guid>(other.Friends);
-            BirthDate = other.BirthDate.ToString();
+            Followers = new List<Guid>(other.Followers);
+            Following = new List<Guid>(Following);
+            BirthDate = other.BirthDate;
             TotalMilesTraveled = other.TotalMilesTraveled;
+            Badges = new List<int>(other.Badges);
+            Bio = other.Bio;
         }
 
         public bool AddNewTripId(string trip)
@@ -190,6 +224,10 @@ namespace FollowMeAPI.DataModels
         {
             Dictionary<string, AttributeValue> tripIdAttr = new Dictionary<string, AttributeValue>();
             Dictionary<string, AttributeValue> friendsAttr = new Dictionary<string, AttributeValue>();
+            Dictionary<string, AttributeValue> badgesAttr = new Dictionary<string, AttributeValue>();
+            Dictionary<string, AttributeValue> followersAttr = new Dictionary<string, AttributeValue>();
+            Dictionary<string, AttributeValue> followingAttr = new Dictionary<string, AttributeValue>();
+
 
             foreach (var trip in TripIds)
             {
@@ -201,18 +239,37 @@ namespace FollowMeAPI.DataModels
                 friendsAttr.Add("Friend", new AttributeValue(friend.ToString()));
             }
 
+            foreach (var badge in Badges)
+            {
+                badgesAttr.Add("Badge", new AttributeValue(badge.ToString()));
+            }
+
+            foreach (var f in Followers)
+            {
+                followersAttr.Add("Follower", new AttributeValue(f.ToString()));
+            }
+
+            foreach (var f in Following)
+            {
+                followingAttr.Add("Following", new AttributeValue(f.ToString()));
+            }
+
             return new Dictionary<string, AttributeValue>()
             {
                 { "Guid", new AttributeValue { S = UserId.ToString() } },
                 { "UserName", new AttributeValue { S = UserName } },
                 { "Name", new AttributeValue { S = Name } },
+                { "Bio", new AttributeValue { S = Bio } },
                 { "Email", new AttributeValue { S = Email } },
                 { "Password", new AttributeValue { S = Password } },
                 { "BirthDate", new AttributeValue { S = BirthDate.ToString() } },
                 { "TotalMilesTraveled", new AttributeValue { N = TotalMilesTraveled.ToString() } },
                 { "NumberOfTrips", new AttributeValue { N = NumberOfTrips.ToString() } },
                 { "Trips", new AttributeValue { M = tripIdAttr } },
-                { "Friends", new AttributeValue {M =  friendsAttr } }
+                { "Friends", new AttributeValue {M =  friendsAttr } },
+                { "Followers", new AttributeValue {M =  followersAttr } },
+                { "Following", new AttributeValue {M =  followingAttr } },
+                { "Badges", new AttributeValue {M =  badgesAttr } }
             };
 
         }
@@ -222,6 +279,7 @@ namespace FollowMeAPI.DataModels
             string id  = obj["Guid"].S;
             string userName = obj["UserName"].S;
             string name = obj["Name"].S;
+            string bio = obj["Bio"].S;
             string email = obj["Email"].S;
             DateTime bday;
             DateTime.TryParse(obj["BirthDate"].S, out bday);
@@ -242,7 +300,25 @@ namespace FollowMeAPI.DataModels
                 friends.Add(new Guid(obj["Friends"].L[i].S));
             }
 
-            return new UserModel(new Guid(id), userName, name, email, pass, bday, totalMiles, friends, tripIds);
+            List<int> badges = new List<int>();
+            for (int i = 0; i < obj["Badges"].L.Count; ++i)
+            {
+             badges.Add(int.Parse(obj["Badges"].L[i].N));   
+            }
+
+            List<Guid> followers = new List<Guid>();
+            for (int i = 0; i < obj["Followers"].L.Count; ++i)
+            {
+                followers.Add(new Guid(obj["Followers"].L[i].S));
+            }
+
+            List<Guid> following = new List<Guid>();
+            for (int i = 0; i < obj["Folllowing"].L.Count; ++i)
+            {
+                following.Add(new Guid(obj["Folllowing"].L[i].S));
+            }
+
+            return new UserModel(new Guid(id), userName, bio, name, email, pass, bday, totalMiles, friends, tripIds, badges, followers, following);
         }
 
         public static bool operator ==(UserModel a, UserModel b)
@@ -252,16 +328,12 @@ namespace FollowMeAPI.DataModels
                 return false;
             }
 
-            if (a.UserId == b.UserId && a.UserName == b.UserName &&
-                a.Name == b.Name && a.Email == b.Email && 
-                a.Password == b.Password && a.BirthDate == b.BirthDate &&
-                a.TotalMilesTraveled == b.TotalMilesTraveled && a.NumberOfTrips == b.NumberOfTrips &&
-                a.TripIds == b.TripIds && a.Friends == b.Friends)
-            {
-                return true;
-            }
-
-            return false;
+            return (a.UserId == b.UserId && a.UserName == b.UserName &&
+                    a.Name == b.Name && a.Email == b.Email && 
+                    a.Password == b.Password && a.BirthDate == b.BirthDate &&
+                    a.TotalMilesTraveled == b.TotalMilesTraveled && a.NumberOfTrips == b.NumberOfTrips &&
+                    a.TripIds == b.TripIds && a.Friends == b.Friends && a.Badges == b.Badges && a.Bio == b.Bio &&
+                    a.Followers == b.Followers && a.Following == b.Following);
         }
 
         public static bool operator !=(UserModel a, UserModel b)

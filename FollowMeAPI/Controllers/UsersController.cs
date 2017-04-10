@@ -21,7 +21,7 @@ namespace FollowMeAPI.Controllers
 
             if (Request.Headers.Contains("guid"))
             {
-                userId = Request.Headers.GetValues("guid").FirstOrDefault();
+                userId = Request.Headers.GetValues("g uid").FirstOrDefault();
 			}
 
             if (userId != null)
