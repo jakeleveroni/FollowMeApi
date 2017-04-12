@@ -37,13 +37,17 @@ namespace FollowMeAPI.DataModels
 		[DynamoDBProperty("ContentId")]
 		public Guid ContentId { get; set; }
 
+        [DataMember(Name="CreationTime")]
+        [DynamoDBProperty("CreationTime")]
+        public DateTime CreationTime { get; set; }
+
 		[DataMember(Name = "Type")]
 		[DynamoDBProperty("Type")]
 		public string Type { get; set; }
 
         public MomentModel() { }
 
-		public MomentModel(string title, string subTitle, Guid guid, Guid contentId, string owner, string longitude, string latitude, string type)
+		public MomentModel(string title, string subTitle, Guid guid, Guid contentId, string owner, string longitude, string latitude, DateTime creationTime, string type)
 		{
 			Title = title;
 		    SubTitle = subTitle;
@@ -52,6 +56,7 @@ namespace FollowMeAPI.DataModels
 			Guid = guid;
 			ContentId = contentId;
 			Creator = owner;
+		    CreationTime = creationTime;
 			Type = type;
 		}
 
@@ -64,6 +69,7 @@ namespace FollowMeAPI.DataModels
 			Guid = other.Guid;
 			ContentId = other.ContentId;
 			Type = other.Type;
+		    CreationTime = other.CreationTime;
 		    SubTitle = other.SubTitle;
 		}
 
@@ -79,7 +85,9 @@ namespace FollowMeAPI.DataModels
                 return false;
             }
 
-            if (a.Title == b.Title && a.Longitude == b.Longitude && a.Latitude == b.Latitude)
+            if (a.Title == b.Title && a.Longitude == b.Longitude && a.Latitude == b.Latitude &&
+                a.Guid == b.Guid && a.SubTitle == b.SubTitle && a.CreationTime == b.CreationTime &&
+                a.ContentId == b.ContentId && a.Creator == b.Creator && a.Type == b.Type)
             {
                 return true;
             }
