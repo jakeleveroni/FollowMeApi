@@ -26,8 +26,8 @@ namespace FollowMeAPI.DataModels
     public class FacebookUser
     {
         // PROPERTIES AND MEMBERS
-        [DataMember(Name="FaceBookUserID")]
-        [DynamoDBHashKey("FaceBookUserID")]
+        [DataMember(Name="FacebookUserID")]
+        [DynamoDBHashKey("FacebookUserID")]
         public string UserId { get; set; }
 
         [DataMember(Name = "ActiveTrip")]
@@ -85,5 +85,13 @@ namespace FollowMeAPI.DataModels
         [DataMember(Name="Badges")]
         [DynamoDBProperty("Badges")]
         public List<int> Badges { get; set; }
+
+        // Methods
+        public FacebookUser() { }
+
+        public string SerializeToJson()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
+        }
     }
 }

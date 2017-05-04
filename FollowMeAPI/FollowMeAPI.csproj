@@ -150,11 +150,13 @@
     <Compile Include="Controllers\ConnectionController.cs" />
     <Compile Include="Controllers\DevController.cs" />
     <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\FacebookUserController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\TripsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DataBaseWrapper\DB.cs" />
     <Compile Include="DataModels\BadgeModel.cs" />
+    <Compile Include="DataModels\FacebookUser.cs" />
     <Compile Include="DataModels\MomentModel.cs" />
     <Compile Include="DataModels\TripModel.cs" />
     <Compile Include="DataModels\UserModel.cs" />

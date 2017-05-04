@@ -23,9 +23,11 @@ namespace FollowMeDataBase.DBCallWrappers
 		private AmazonDynamoDBConfig _config;
 		private readonly AmazonDynamoDBClient _client;
 		private Table _userTableContext;
+	    private Table _facebookUserTableContext;
 		private Table _tripTableContext;
 		private Table _momentTableContext;
 		private readonly string m_userTableName = "Users";
+	    private readonly string m_facebookUserTableName = "FacebookUser";
 		private readonly string m_tripTableName = "Trips";
 		private readonly string m_MomentTableName = "Moments";
 
@@ -100,6 +102,7 @@ namespace FollowMeDataBase.DBCallWrappers
 				_userTableContext = Table.LoadTable(_client, m_userTableName);
 				_tripTableContext = Table.LoadTable(_client, m_tripTableName);
 				_momentTableContext = Table.LoadTable(_client, m_MomentTableName);
+                _facebookUserTableContext = Table.LoadTable(_client, m_facebookUserTableName);
 			}
 			catch (Exception ex)
 			{
@@ -108,8 +111,24 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
-		#region USER_TABLE_WRAPPERS
-		public bool AddNewUser(UserModel newUser)
+        #region FACEBOOK_USER_TABLE_WRAPPERS
+        public bool AddNewFacebookUser(FacebookUser newUser)
+		{
+			try
+			{
+				_facebookUserTableContext.PutItem(Document.FromJson(newUser.SerializeToJson()));
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Tools.logger.Error("[ADD NEW USER][ERROR] : Could not add user to database, " + ex.Message);
+				return false;
+			}
+		}
+        #endregion
+
+        #region USER_TABLE_WRAPPERS
+        public bool AddNewUser(UserModel newUser)
 		{
 			try
 			{
