@@ -269,6 +269,20 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
+	    public string GetFacebookUser(string primaryKey)
+	    {
+	        try
+	        {
+	            Document doc = _facebookUserTableContext.GetItem(primaryKey);
+	            return doc.ToJson();
+	        }
+	        catch (Exception ex)
+	        {
+				Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+	            return string.Empty;
+	        }
+	    }
+
 		public UserModel GetUser(UserModel user)
 		{
 			try

@@ -89,6 +89,26 @@ namespace FollowMeAPI.DataModels
         // Methods
         public FacebookUser() { }
 
+        public FacebookUser(bool isValid)
+        {
+            if (!isValid)
+            {
+                UserId = null;
+                UserName = null;
+                Name = null;
+                Email = null;
+                Password = null;
+                BirthDate = null;
+                TripIds = null;
+                Friends = null;
+                TotalMilesTraveled = 0;
+                Badges = null;
+                Bio = null;
+                Followers = null;
+                Following = null;
+            }
+        }
+
         public string SerializeToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
