@@ -125,6 +125,34 @@ namespace FollowMeDataBase.DBCallWrappers
 				return false;
 			}
 		}
+
+	    public string GetFacebookUser(string primaryKey)
+	    {
+	        try
+	        {
+	            Document doc = _facebookUserTableContext.GetItem(primaryKey);
+	            return doc.ToJson();
+	        }
+	        catch (Exception ex)
+	        {
+				Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
+	            return string.Empty;
+	        }
+	    }
+
+	    public bool RemoveFacebookUser(string primaryKey)
+	    {
+	        try
+	        {
+	            _facebookUserTableContext.DeleteItem(primaryKey);
+                return true;
+	        }
+	        catch (Exception ex)
+	        {
+				Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user to database, " + ex.Message);
+				return false;
+	        } 
+	    }
         #endregion
 
         #region USER_TABLE_WRAPPERS
@@ -255,6 +283,8 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
+
+
 		public string GetUser(string primaryKey)
 		{
 			try
@@ -268,20 +298,6 @@ namespace FollowMeDataBase.DBCallWrappers
 				return string.Empty;
 			}
 		}
-
-	    public string GetFacebookUser(string primaryKey)
-	    {
-	        try
-	        {
-	            Document doc = _facebookUserTableContext.GetItem(primaryKey);
-	            return doc.ToJson();
-	        }
-	        catch (Exception ex)
-	        {
-				Tools.logger.Error("[USER EXISTS][ERROR] : Error occurred while locating user, " + ex.Message);
-	            return string.Empty;
-	        }
-	    }
 
 		public UserModel GetUser(UserModel user)
 		{

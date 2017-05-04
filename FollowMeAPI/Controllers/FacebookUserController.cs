@@ -65,5 +65,31 @@ namespace FollowMeAPI.Controllers
             return jsonFacebookUser;
         }
 
+        [HttpDelete]
+        [Route("delete")]
+        public bool DeleteFacebookUser()
+        {
+            string userId = string.Empty;
+
+            if (Request.Headers.Contains("facebookid"))
+            {
+                userId = Request.Headers.GetValues("facebookid").FirstOrDefault();
+            }
+
+            if (userId != null)
+            {
+                try
+                {
+                    WebApiApplication.Db.RemoveFacebookUser(userId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+					Tools.logger.Error("[REMOVE USER][ERROR] : Could not remove user from Db, " + ex.Message);
+                }
+            }
+
+            return false;
+        }
     }
 }
