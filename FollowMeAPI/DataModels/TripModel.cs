@@ -43,11 +43,16 @@ namespace FollowMeAPI.DataModels
         [DynamoDBProperty("Moments")]
         public List<Guid> Moments { get; set; }
 
+        [DataMember(Name = "Route")]
+        [DynamoDBProperty("Route")]
+        public List<string> Route { get; set; }
+
         // METHODS
         public TripModel()
         {
             Participants = new List<Guid>();
 			Moments = new List<Guid>();
+            Route = new List<string>();
         }
 
         public TripModel(Guid id, string name, ulong miles, string desc, List<Guid> participants = null)
@@ -57,6 +62,7 @@ namespace FollowMeAPI.DataModels
             TripMileage = miles;
             TripDescription = desc;
 			Moments = new List<Guid>();
+            Route = new List<string>();
 
             if (participants != null)
             {
@@ -76,6 +82,7 @@ namespace FollowMeAPI.DataModels
             TripDescription = other.TripDescription;
             Participants = new List<Guid>(other.Participants);
             Moments = new List<Guid>(other.Moments);
+            Route = new List<string>(other.Route);
         }
 
         public TripModel(bool isInvalid)
@@ -88,6 +95,9 @@ namespace FollowMeAPI.DataModels
                 TripDescription = null;
                 Moments = null;
                 Participants = null;
+                Participants = new List<Guid>();
+                Moments = new List<Guid>();
+                Route = new List<string>();
             }
         }
 
@@ -106,6 +116,7 @@ namespace FollowMeAPI.DataModels
 			ulong.TryParse(mileage, out miles);
             List<Guid> moments = null;
             List <Guid> participants = null;
+            List<string> route = null;
 
             if (obj["Participants"].L.Count > 0)
             {
@@ -125,9 +136,19 @@ namespace FollowMeAPI.DataModels
                 } 
             }
 
+            if (obj["Route"].L.Count > 0)
+            {
+                moments = new List<Guid>();
+                for (int i = 0; i < obj["Route"].L.Count; ++i)
+                {
+                    route.Add(obj["Route"].L[i].S);
+                }
+            }
+
             TripModel trip = new TripModel(new Guid(id), name, miles, desc);
             trip.Participants = participants;
             trip.Moments = moments;
+            trip.Route = route;
 
             return trip;
         }
@@ -141,7 +162,7 @@ namespace FollowMeAPI.DataModels
 
             if (a.TripId == b.TripId && a.TripMileage == b.TripMileage && 
                 a.TripName == b.TripName && a.TripDescription == b.TripDescription &&
-                a.Participants == b.Participants && a.Moments == b.Moments)
+                a.Participants == b.Participants && a.Moments == b.Moments && a.Route == b.Route)
             {
                 return true;
             }
@@ -191,6 +212,16 @@ namespace FollowMeAPI.DataModels
             }
 
             return false;
+        }
+
+        public void AddRoutePoint(string point)
+        {
+            Route.Add(point);
+        }
+
+        public void RemoveRoutePoint(string point)
+        {
+            Route.Remove(point);
         }
 
         public static bool operator !=(TripModel a, TripModel b)

@@ -158,6 +158,7 @@
     <Compile Include="DataModels\BadgeModel.cs" />
     <Compile Include="DataModels\FacebookUser.cs" />
     <Compile Include="DataModels\MomentModel.cs" />
+    <Compile Include="DataModels\Position.cs" />
     <Compile Include="DataModels\TripModel.cs" />
     <Compile Include="DataModels\UserModel.cs" />
     <Compile Include="Global.asax.cs">

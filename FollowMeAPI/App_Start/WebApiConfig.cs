@@ -14,7 +14,6 @@ namespace FollowMeAPI
         {
             // enable log4net logging for debugging
             BasicConfigurator.Configure();
-            FolloMeWebSocketServer FolloMeWSS = new FolloMeWebSocketServer();
 
             Tools.logger.Info("[APPLICATION START]");
 

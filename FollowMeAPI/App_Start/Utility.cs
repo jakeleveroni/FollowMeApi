@@ -23,6 +23,7 @@ namespace FollowMeAPI
         UpdateTripMileage,
         UpdateMoments,
         InvalidUpdate,
+        Route
     }
 
     public enum MomentItemEnums
@@ -96,6 +97,8 @@ namespace FollowMeAPI
                     return TripItemEnums.UpdateParticipants;
                 case "Moments":
                     return TripItemEnums.UpdateMoments;
+                case "Route":
+                    return TripItemEnums.Route;
                 default:
                     return TripItemEnums.InvalidUpdate;
             }

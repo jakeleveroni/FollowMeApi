@@ -549,7 +549,14 @@ namespace FollowMeDataBase.DBCallWrappers
 					updateAtribNames.Add("#M", "Moments");
 					updateExpression = "SET #M = list_append(#M, :newMoment)";
 					break;
-				default:
+                case TripItemEnums.Route:
+                    List<AttributeValue> routePos = new List<AttributeValue>();
+                    routePos.Add(new AttributeValue(newValue));
+                    updateAttribValues.Add(":newRoutePoint", new AttributeValue { L = routePos });
+                    updateAtribNames.Add("#R", "Route");
+                    updateExpression = "SET #R = list_append(#R, :newRoutePoint)";
+                    break;
+                default:
 					Tools.logger.Error("[UPDATE-TRIP][ERROR] : Invalid update option provided");
 					return false;
 			}

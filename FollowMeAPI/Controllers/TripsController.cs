@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace FollowMeAPI.Controllers
 {
@@ -63,10 +64,10 @@ namespace FollowMeAPI.Controllers
 
         [HttpDelete]
         [Route("delete")]
-		public bool DeleteTripModel()
+        public bool DeleteTripModel()
         {
-            string tripId= string.Empty;
-			
+            string tripId = string.Empty;
+
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
@@ -102,7 +103,7 @@ namespace FollowMeAPI.Controllers
 
             if (tripId == null)
             {
-				return false;
+                return false;
             }
 
             if (Request.Headers.Contains("TripName"))
@@ -140,11 +141,51 @@ namespace FollowMeAPI.Controllers
                         }
                     }
 
-					return  true;
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip in Db, " + ex.Message);
+                }
+            }
+
+            return false;
+        }
+
+        [HttpPatch]
+        [Route("route/update")]
+        public bool AddRoutePoint()
+        {
+            string tripId = null;
+            StringBuilder builder = new StringBuilder();
+
+            if (Request.Headers.Contains("guid"))
+            {
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+            }
+
+            if (tripId == null)
+            {
+                return false;
+            }
+
+            if (Request.Headers.Contains("Longitude"))
+            {
+                builder.Append(Request.Headers.GetValues("Longitude").FirstOrDefault() + ", ");
+
+                if (Request.Headers.Contains("Latitude"))
+                {
+                    builder.Append(Request.Headers.GetValues("Latitude").FirstOrDefault());
+
+                    try
+                    {
+                        WebApiApplication.Db.UpdateTrip(tripId, builder.ToString(), TripItemEnums.Route);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
+                    }
                 }
             }
 
