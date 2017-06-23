@@ -191,5 +191,52 @@ namespace FollowMeAPI.Controllers
 
             return false;
         }
+
+        // when passing in a chunk of location data, do it 
+        // in the format and from least recent to most recent:
+        // "(longitude,latitude) (longitude,latitude) ... "
+        [HttpPatch]
+        [Route("route/update")]
+        public bool AddRoutePointsChunk([FromBody] string routePoints)
+        {
+            string tripId = null;
+            List<string> routePoints = ParseRouteInput(routePoints);
+
+            if (Request.Headers.Contains("guid"))
+            {
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+            }
+
+            if (tripId == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                WebApiApplication.Db.UpdateTrip(tripId, "", TripItemEnums.Route, new List<string>(new string[] { builder.ToString() } ));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
+            }
+
+            return false;
+        }
+
+        private List<string> ParseRouteInput(string routes)
+        {
+            List<string> route = new List<string>();
+            var points = routes.Split(' ');
+
+            foreach (var point in points)
+            {
+                var data = point.Split(',');
+                route.Add($"{data[0].RemoveAt(0)} {data[1].RemoveAt(data[1].Length - 1)}");
+            }
+
+            return route;
+        }
     }
 }

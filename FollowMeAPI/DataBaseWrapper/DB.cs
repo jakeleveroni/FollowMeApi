@@ -517,7 +517,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
-		public bool UpdateTrip(string tripId, string newValue, TripItemEnums updateType)
+		public bool UpdateTrip(string tripId, string newValue, TripItemEnums updateType, List<string> route = null)
 		{
 			Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
 			Dictionary<string, string> updateAtribNames = new Dictionary<string, string>();
@@ -550,8 +550,7 @@ namespace FollowMeDataBase.DBCallWrappers
 					updateExpression = "SET #M = list_append(#M, :newMoment)";
 					break;
                 case TripItemEnums.Route:
-                    List<AttributeValue> routePos = new List<AttributeValue>();
-                    routePos.Add(new AttributeValue(newValue));
+                    List<AttributeValue> routePos = new List<AttributeValue>(route);
                     updateAttribValues.Add(":newRoutePoint", new AttributeValue { L = routePos });
                     updateAtribNames.Add("#R", "Route");
                     updateExpression = "SET #R = list_append(#R, :newRoutePoint)";
