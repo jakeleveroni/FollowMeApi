@@ -550,7 +550,13 @@ namespace FollowMeDataBase.DBCallWrappers
 					updateExpression = "SET #M = list_append(#M, :newMoment)";
 					break;
                 case TripItemEnums.Route:
-                    List<AttributeValue> routePos = new List<AttributeValue>(route);
+                    List<AttributeValue> routePos = new List<AttributeValue>();
+
+                    foreach(var point in route)
+                    {
+                        routePos.Add(new AttributeValue(point));
+                    }
+
                     updateAttribValues.Add(":newRoutePoint", new AttributeValue { L = routePos });
                     updateAtribNames.Add("#R", "Route");
                     updateExpression = "SET #R = list_append(#R, :newRoutePoint)";

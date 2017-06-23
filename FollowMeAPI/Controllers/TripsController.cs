@@ -200,7 +200,7 @@ namespace FollowMeAPI.Controllers
         public bool AddRoutePointsChunk([FromBody] string routePoints)
         {
             string tripId = null;
-            List<string> routePoints = ParseRouteInput(routePoints);
+            List<string> points = ParseRouteInput(routePoints);
 
             if (Request.Headers.Contains("guid"))
             {
@@ -214,7 +214,7 @@ namespace FollowMeAPI.Controllers
 
             try
             {
-                WebApiApplication.Db.UpdateTrip(tripId, "", TripItemEnums.Route, new List<string>(new string[] { builder.ToString() } ));
+                WebApiApplication.Db.UpdateTrip(tripId, "", TripItemEnums.Route, new List<string>(points));
                 return true;
             }
             catch (Exception ex)
@@ -225,6 +225,37 @@ namespace FollowMeAPI.Controllers
             return false;
         }
 
+        [HttpGet]
+        [Route("route/get")]
+        public List<string> GetRoute()
+        {
+            string tripId = null;
+
+            if (Request.Headers.Contains("guid"))
+            {
+                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+
+                if (tripId == null)
+                {
+                    return null;
+                }
+            }
+
+            try
+            {
+                string tripString = WebApiApplication.Db.GetTrip(tripId);
+                var trip = JsonConvert.DeserializeObject<TripModel>(tripString);
+
+                return trip.Route;
+            }
+            catch (Exception ex)
+            {
+                Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not get trip route in Db, " + ex.Message);
+            }
+
+            return null;
+        }
+
         private List<string> ParseRouteInput(string routes)
         {
             List<string> route = new List<string>();
@@ -233,7 +264,7 @@ namespace FollowMeAPI.Controllers
             foreach (var point in points)
             {
                 var data = point.Split(',');
-                route.Add($"{data[0].RemoveAt(0)} {data[1].RemoveAt(data[1].Length - 1)}");
+                route.Add($"{data[0].Substring(1)} {data[1].Substring(0, data[1].Length - 1)}");
             }
 
             return route;
