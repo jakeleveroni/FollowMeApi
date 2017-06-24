@@ -187,7 +187,7 @@ namespace FollowMeAPI.Controllers
 
         [HttpGet]
         [Route("route/get")]
-        public string GetRoute()
+        public List<RouteDataPoint> GetRoute()
         {
             string tripId = null;
 
@@ -197,7 +197,7 @@ namespace FollowMeAPI.Controllers
 
                 if (tripId == null)
                 {
-                    return string.Empty;
+                    return null;
                 }
             }
 
@@ -205,14 +205,14 @@ namespace FollowMeAPI.Controllers
             {
                 string tripString = WebApiApplication.Db.GetTrip(tripId);
                 var trip = JsonConvert.DeserializeObject<TripModel>(tripString);
-                return JsonConvert.SerializeObject(trip.Route);
+                return trip.Route;
             }
             catch (Exception ex)
             {
                 Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not get trip route in Db, " + ex.Message);
             }
 
-            return string.Empty;
+            return null;
         }
 
         private List<RouteDataPoint> ParseRouteInput(string routes)
