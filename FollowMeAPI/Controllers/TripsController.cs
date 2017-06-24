@@ -259,7 +259,7 @@ namespace FollowMeAPI.Controllers
         private List<string> ParseRouteInput(string routes)
         {
             List<string> route = new List<string>();
-            var points = routes.Split(' ');
+            var points = routes.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var point in points)
             {

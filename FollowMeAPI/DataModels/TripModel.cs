@@ -214,14 +214,15 @@ namespace FollowMeAPI.DataModels
             return false;
         }
 
-        public void AddRoutePoint(string point)
+        public void AddRoutePoint(float longitude, float latitude)
         {
-            Route.Add(point);
+
+            Route.Add($"({longitude},{latitude})");
         }
 
-        public void RemoveRoutePoint(string point)
+        public void RemoveRoutePoint(float longitude, float latitude)
         {
-            Route.Remove(point);
+            Route.Remove($"({longitude},{latitude})");
         }
 
         public static bool operator !=(TripModel a, TripModel b)

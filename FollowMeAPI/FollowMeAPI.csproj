@@ -180,6 +180,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\FolloMeAPI-Dev.pubxml" />
     <None Include="PublishProfiles\FollowMeAPI.pubxml" />
     <None Include="Web.Debug.config">
