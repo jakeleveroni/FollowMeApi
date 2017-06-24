@@ -152,55 +152,15 @@ namespace FollowMeAPI.Controllers
             return false;
         }
 
-        [HttpPatch]
-        [Route("route/update")]
-        public bool AddRoutePoint()
-        {
-            string tripId = null;
-            StringBuilder builder = new StringBuilder();
-
-            if (Request.Headers.Contains("guid"))
-            {
-                tripId = Request.Headers.GetValues("guid").FirstOrDefault();
-            }
-
-            if (tripId == null)
-            {
-                return false;
-            }
-
-            if (Request.Headers.Contains("Longitude"))
-            {
-                builder.Append(Request.Headers.GetValues("Longitude").FirstOrDefault() + ", ");
-
-                if (Request.Headers.Contains("Latitude"))
-                {
-                    builder.Append(Request.Headers.GetValues("Latitude").FirstOrDefault());
-
-                    try
-                    {
-                        WebApiApplication.Db.UpdateTrip(tripId, builder.ToString(), TripItemEnums.Route);
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
-                    }
-                }
-            }
-
-            return false;
-        }
-
         // when passing in a chunk of location data, do it 
         // in the format and from least recent to most recent:
         // "(longitude,latitude) (longitude,latitude) ... "
         [HttpPatch]
         [Route("route/update")]
-        public bool AddRoutePointsChunk([FromBody] string routePoints)
+        public bool AddRoutePoints([FromBody] string routePoints)
         {
             string tripId = null;
-            List<string> points = ParseRouteInput(routePoints);
+            List<RouteDataPoint> points = ParseRouteInput(routePoints);
 
             if (Request.Headers.Contains("guid"))
             {
@@ -214,7 +174,7 @@ namespace FollowMeAPI.Controllers
 
             try
             {
-                WebApiApplication.Db.UpdateTrip(tripId, "", TripItemEnums.Route, new List<string>(points));
+                WebApiApplication.Db.UpdateTripRoute(tripId, points, TripItemEnums.Route);
                 return true;
             }
             catch (Exception ex)
@@ -227,7 +187,7 @@ namespace FollowMeAPI.Controllers
 
         [HttpGet]
         [Route("route/get")]
-        public List<string> GetRoute()
+        public string GetRoute()
         {
             string tripId = null;
 
@@ -237,7 +197,7 @@ namespace FollowMeAPI.Controllers
 
                 if (tripId == null)
                 {
-                    return null;
+                    return string.Empty;
                 }
             }
 
@@ -245,26 +205,25 @@ namespace FollowMeAPI.Controllers
             {
                 string tripString = WebApiApplication.Db.GetTrip(tripId);
                 var trip = JsonConvert.DeserializeObject<TripModel>(tripString);
-
-                return trip.Route;
+                return JsonConvert.SerializeObject(trip.Route);
             }
             catch (Exception ex)
             {
                 Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not get trip route in Db, " + ex.Message);
             }
 
-            return null;
+            return string.Empty;
         }
 
-        private List<string> ParseRouteInput(string routes)
+        private List<RouteDataPoint> ParseRouteInput(string routes)
         {
-            List<string> route = new List<string>();
+            List<RouteDataPoint> route = new List<RouteDataPoint>();
             var points = routes.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var point in points)
             {
                 var data = point.Split(',');
-                route.Add($"{data[0].Substring(1)} {data[1].Substring(0, data[1].Length - 1)}");
+                route.Add(new RouteDataPoint(float.Parse(data[0].Substring(1)), float.Parse(data[1].Substring(0, data[1].Length - 1))));
             }
 
             return route;

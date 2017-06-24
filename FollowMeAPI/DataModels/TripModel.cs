@@ -45,14 +45,14 @@ namespace FollowMeAPI.DataModels
 
         [DataMember(Name = "Route")]
         [DynamoDBProperty("Route")]
-        public List<string> Route { get; set; }
+        public List<RouteDataPoint> Route { get; set; }
 
         // METHODS
         public TripModel()
         {
             Participants = new List<Guid>();
 			Moments = new List<Guid>();
-            Route = new List<string>();
+            Route = new List<RouteDataPoint>();
         }
 
         public TripModel(Guid id, string name, ulong miles, string desc, List<Guid> participants = null)
@@ -62,7 +62,7 @@ namespace FollowMeAPI.DataModels
             TripMileage = miles;
             TripDescription = desc;
 			Moments = new List<Guid>();
-            Route = new List<string>();
+            Route = new List<RouteDataPoint>();
 
             if (participants != null)
             {
@@ -82,7 +82,7 @@ namespace FollowMeAPI.DataModels
             TripDescription = other.TripDescription;
             Participants = new List<Guid>(other.Participants);
             Moments = new List<Guid>(other.Moments);
-            Route = new List<string>(other.Route);
+            Route = new List<RouteDataPoint>(other.Route);
         }
 
         public TripModel(bool isInvalid)
@@ -97,7 +97,7 @@ namespace FollowMeAPI.DataModels
                 Participants = null;
                 Participants = new List<Guid>();
                 Moments = new List<Guid>();
-                Route = new List<string>();
+                Route = new List<RouteDataPoint>();
             }
         }
 
@@ -116,7 +116,7 @@ namespace FollowMeAPI.DataModels
 			ulong.TryParse(mileage, out miles);
             List<Guid> moments = null;
             List <Guid> participants = null;
-            List<string> route = null;
+            List<RouteDataPoint> route = null;
 
             if (obj["Participants"].L.Count > 0)
             {
@@ -141,7 +141,7 @@ namespace FollowMeAPI.DataModels
                 moments = new List<Guid>();
                 for (int i = 0; i < obj["Route"].L.Count; ++i)
                 {
-                    route.Add(obj["Route"].L[i].S);
+                    route.Add(new RouteDataPoint(float.Parse(obj["Route"].L[i].M["Longitude"].S), float.Parse(obj["Route"].L[i].M["Latitude"].S)));
                 }
             }
 
@@ -217,12 +217,12 @@ namespace FollowMeAPI.DataModels
         public void AddRoutePoint(float longitude, float latitude)
         {
 
-            Route.Add($"({longitude},{latitude})");
+            Route.Add(new RouteDataPoint(longitude, latitude));
         }
 
         public void RemoveRoutePoint(float longitude, float latitude)
         {
-            Route.Remove($"({longitude},{latitude})");
+            Route.Remove(new RouteDataPoint(longitude, latitude));
         }
 
         public static bool operator !=(TripModel a, TripModel b)

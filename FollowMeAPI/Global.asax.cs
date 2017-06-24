@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
 using FollowMeDataBase.DBCallWrappers;
 using FollowMeAPI.DataModels;
-using System;
+using System.Collections.Generic;
 
 namespace FollowMeAPI
 {
@@ -17,7 +17,7 @@ namespace FollowMeAPI
             //t.AddRoutePoint(1.0f, 2.0f);
             //t.AddRoutePoint(2.0f, 3.0f);
 
-            //Db.AddNewTrip(t);
+            Db.UpdateTripRoute("34bcd503-3fb5-4d15-b5d9-43f67125371a", new List<RouteDataPoint> { new RouteDataPoint(5, 5), new RouteDataPoint(6, 6), new RouteDataPoint(7, 7) }, TripItemEnums.Route);
         }
     }
 }

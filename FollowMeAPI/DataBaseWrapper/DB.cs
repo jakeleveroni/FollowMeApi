@@ -517,7 +517,7 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
-		public bool UpdateTrip(string tripId, string newValue, TripItemEnums updateType, List<string> route = null)
+		public bool UpdateTrip(string tripId, string newValue, TripItemEnums updateType)
 		{
 			Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
 			Dictionary<string, string> updateAtribNames = new Dictionary<string, string>();
@@ -549,18 +549,6 @@ namespace FollowMeDataBase.DBCallWrappers
 					updateAtribNames.Add("#M", "Moments");
 					updateExpression = "SET #M = list_append(#M, :newMoment)";
 					break;
-                case TripItemEnums.Route:
-                    List<AttributeValue> routePos = new List<AttributeValue>();
-
-                    foreach(var point in route)
-                    {
-                        routePos.Add(new AttributeValue(point));
-                    }
-
-                    updateAttribValues.Add(":newRoutePoint", new AttributeValue { L = routePos });
-                    updateAtribNames.Add("#R", "Route");
-                    updateExpression = "SET #R = list_append(#R, :newRoutePoint)";
-                    break;
                 default:
 					Tools.logger.Error("[UPDATE-TRIP][ERROR] : Invalid update option provided");
 					return false;
@@ -589,7 +577,52 @@ namespace FollowMeDataBase.DBCallWrappers
 			}
 		}
 
-		public bool RemoveTrip(TripModel oldTrip)
+        public bool UpdateTripRoute(string tripId, List<RouteDataPoint> points, TripItemEnums updateType)
+        {
+            Dictionary<string, AttributeValue> updateAttribValues = new Dictionary<string, AttributeValue>();
+            Dictionary<string, string> updateAtribNames = new Dictionary<string, string>() { { "#R", "Route" } };
+            List<AttributeValue> newPoints = new List<AttributeValue>();
+            string updateExpression = string.Empty;
+
+            if (updateType != TripItemEnums.Route)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (var point in points)
+                {
+                    newPoints.Add(new AttributeValue { M = point.RouteAttibute });
+                }
+
+                updateAttribValues.Add($":newPoint" , new AttributeValue { L = newPoints });
+                updateExpression = $"SET #R = list_append(#R, :newPoint)";
+
+
+                var request = new UpdateItemRequest
+                {
+                    TableName = m_tripTableName,
+                    Key = new Dictionary<string, AttributeValue>() { { "TripId", new AttributeValue { S = tripId.ToString() } } },
+                    ExpressionAttributeNames = updateAtribNames,
+                    ExpressionAttributeValues = updateAttribValues,
+                    UpdateExpression = updateExpression
+                };
+
+                try
+                {
+                    var response = _client.UpdateItem(request);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Tools.logger.Error("[UPDATE-TRIP][ERROR] : Could not update the trip route item, + " + ex.Message);
+                    return false;
+                }
+            }
+        }
+
+
+        public bool RemoveTrip(TripModel oldTrip)
 		{
 			try
 			{
