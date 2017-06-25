@@ -7,6 +7,7 @@ using System.Net.Http;
 using FollowMeAPI.DataModels;
 using Newtonsoft.Json;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FollowMeAPI.Controllers
 {
@@ -152,37 +153,71 @@ namespace FollowMeAPI.Controllers
             return false;
         }
 
-        // when passing in a chunk of location data, do it 
-        // in the format and from least recent to most recent:
-        // "(longitude,latitude) (longitude,latitude) ... "
+        // NOTE: This is the correct way to do it, implemented a workaround for the current time
+        //[HttpPatch]
+        //[Route("route/update")]
+        //public DataModels.DTO.RouteDTO AddRoutePoints([FromBody] DataModels.DTO.RouteDTO route)
+        //{
+        //    string tripId = null;
+        //    if (Request.Headers.Contains("guid"))
+        //    {
+        //        tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+        //    }
+
+        //    if (tripId != null)
+        //    {
+        //        try
+        //        {
+        //            WebApiApplication.Db.UpdateTripRoute(tripId, route.RoutePoints, TripItemEnums.Route);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
+        //        }
+        //    }
+
+        //    return route;
+        //}
+
+            // NOTE: workaround for above function ^^^
         [HttpPatch]
         [Route("route/update")]
-        public bool AddRoutePoints([FromBody] string routePoints)
+        public List<RouteDataPoint> AddRoutePoints()
         {
             string tripId = null;
-            List<RouteDataPoint> points = ParseRouteInput(routePoints);
-
+            string route = null;
+            List<RouteDataPoint> points = new List<RouteDataPoint>();
             if (Request.Headers.Contains("guid"))
             {
                 tripId = Request.Headers.GetValues("guid").FirstOrDefault();
+
+                if (Request.Headers.Contains("Route"))
+                {
+                    route = Request.Headers.GetValues("Route").FirstOrDefault();
+
+                    if (route != null)
+                    {
+                        points = ParseRouteInput(route);
+                    }
+
+                    if (points != null)
+                    {
+                        if (tripId != null)
+                        {
+                            try
+                            {
+                                WebApiApplication.Db.UpdateTripRoute(tripId, points, TripItemEnums.Route);
+                            }
+                            catch (Exception ex)
+                            {
+                                Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
+                            }
+                        }
+                    }
+                }
             }
 
-            if (tripId == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                WebApiApplication.Db.UpdateTripRoute(tripId, points, TripItemEnums.Route);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Tools.logger.Error("[UPDATE TRIP][ERROR] : Could not update trip route in Db, " + ex.Message);
-            }
-
-            return false;
+            return points;
         }
 
         [HttpGet]

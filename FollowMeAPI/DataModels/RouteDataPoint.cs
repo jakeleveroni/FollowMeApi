@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 
 namespace FollowMeAPI.DataModels
 {
+    [DataContract(Name = "RoutePoints")]
     public class RouteDataPoint
     {
         [DataMember(Name = "Longitude")]

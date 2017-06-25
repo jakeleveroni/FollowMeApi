@@ -156,6 +156,7 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DataBaseWrapper\DB.cs" />
     <Compile Include="DataModels\BadgeModel.cs" />
+    <Compile Include="DataModels\DTO\RouteDTO.cs" />
     <Compile Include="DataModels\FacebookUser.cs" />
     <Compile Include="DataModels\MomentModel.cs" />
     <Compile Include="DataModels\Position.cs" />

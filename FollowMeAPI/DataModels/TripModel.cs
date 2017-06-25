@@ -145,11 +145,12 @@ namespace FollowMeAPI.DataModels
                 }
             }
 
-            TripModel trip = new TripModel(new Guid(id), name, miles, desc);
-            trip.Participants = participants;
-            trip.Moments = moments;
-            trip.Route = route;
-
+            TripModel trip = new TripModel(new Guid(id), name, miles, desc)
+            {
+                Participants = participants,
+                Moments = moments,
+                Route = route
+            };
             return trip;
         }
 
